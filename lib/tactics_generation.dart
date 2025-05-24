@@ -1,10 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:tactinho/football_field.dart';
 import 'package:tactinho/loading.dart';
+import 'package:tactinho/tactics_board.dart';
+import 'package:tactinho/backend.dart';
 
 class PrecacheScreen extends StatefulWidget {
+  final List<PlayerFormation> scene;
+  const PrecacheScreen({Key? key, required this.scene}) : super(key: key);
   @override
   State<PrecacheScreen> createState() => _PrecacheScreenState();
 }
@@ -12,6 +17,8 @@ class PrecacheScreen extends StatefulWidget {
 class _PrecacheScreenState extends State<PrecacheScreen> {
   List<Image> pepFrames = [];
   bool _done = false;
+  List<Player> currentPlayers = [];
+  List<PlayerFormation> scene = [];
 
   @override
   void didChangeDependencies() {
@@ -21,19 +28,57 @@ class _PrecacheScreenState extends State<PrecacheScreen> {
     }
   }
 
-  Future<void> _precacheImages() async {
-    pepFrames = [];
-    for (int i = 1; i <= 15; i++) {
-      pepFrames.add(Image.asset('assets/pep/pep_$i.png'));
+  Map<String, Map<dynamic, dynamic>> sceneToJson() {
+    scene = widget.scene;
+    final toSend = {
+      "players": {},
+      "referees": {},
+      "ball": {},
+      "goalkeeper": {},
+      "goalpost": {}
+    };
+    var count = 0;
+    bool has_Ball = false;
+    for (var player in scene) {
+      if (player.ballpossession) {
+        has_Ball = true;
+        toSend["ball"]?['1'] = {
+          "conf": 0.11,
+          "position_transformed": [
+            60 - (player.position.dy * 60),
+            player.position.dx * 90
+          ]
+        };
+      }
+      if (player.number == 3) {
+        toSend["goalkeeper"]?['1'] = {
+          "team": 1,
+          "position_transformed": [
+            60 - (player.position.dy * 60),
+            player.position.dx * 90
+          ]
+        };
+      } else {
+        toSend["players"]?[count.toString()] = {
+          "team": player.number - 1 ,
+          "position_transformed": [
+            60 - (player.position.dy * 60),
+            player.position.dx * 90
+          ],
+          if (has_Ball) "has_ball": true,
+        };
+        has_Ball = false;
+      }
+      count++;
     }
-    await Future.wait(
-      pepFrames.map((img) => precacheImage(img.image, context)),
-    );
-    // add delay to see the loading animation
-    await Future.delayed(const Duration(milliseconds: 5000));
-    setState(() {
-      _done = true;
-    });
+    return toSend;
+  }
+
+  Future<void> _precacheImages() async {
+    var jsonToSend = sceneToJson();
+    // final jsonString = jsonEncode(jsonToSend);
+    final response = await sendPlayerData(jsonToSend);
+    
   }
 
   @override
@@ -77,7 +122,7 @@ class _TacticsRunState extends State<TacticsRun> {
     super.initState();
     _pepFrames = widget.pepFrames;
     _loadFormationsFromJson();
-    Future.delayed(Duration(milliseconds: 500), _startAnimationLoop);
+    Future.delayed(const Duration(milliseconds: 500), _startAnimationLoop);
   }
 
   @override
@@ -102,7 +147,7 @@ class _TacticsRunState extends State<TacticsRun> {
         _startTalkingAnimation();
       });
 
-      await Future.delayed(Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 2));
       if (!mounted) return;
 
       setState(() {
@@ -110,7 +155,7 @@ class _TacticsRunState extends State<TacticsRun> {
         _stopTalkingAnimation();
       });
 
-      await Future.delayed(Duration(seconds: 1));
+      await Future.delayed(const Duration(seconds: 1));
       if (!mounted) return;
     }
     setState(() {
@@ -123,7 +168,7 @@ class _TacticsRunState extends State<TacticsRun> {
   void _startTalkingAnimation() {
     _talkingAnimationTimer?.cancel();
     _talkingAnimationTimer =
-        Timer.periodic(Duration(milliseconds: 100), (timer) {
+        Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (!mounted) return;
       setState(() {
         _talkingFrameIndex = (_talkingFrameIndex + 1) % _pepFrames.length;

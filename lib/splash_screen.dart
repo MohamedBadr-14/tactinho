@@ -71,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     });
     
     // Navigate to main layout after animation completes
-    Timer(const Duration(milliseconds: 4000), () {
+    Timer(const Duration(milliseconds: 1000), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const MainLayout()),
       );

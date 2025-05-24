@@ -7,6 +7,8 @@ from sklearn.neighbors import NearestNeighbors
 import json
 
 scenes_arr = [
+    {'players': {'0': {'team': 0, 'position_transformed': [33.99487836107551, 27.367624810892618], 'has_ball': True}, '1': {'team': 0, 'position_transformed': [33.6875800256081, 61.6792738275342]}, '2': {'team': 1, 'position_transformed': [45.05761843790012, 27.231467473525004]}}, 'referees': {}, 'ball': {'1': {'conf': 0.11, 'position_transformed': [33.99487836107551, 27.367624810892618]}}, 'goalkeeper': {'1': {'team': 1, 'position_transformed': [59.116517285531366, 41.52798789712562]}}, 'goalpost': {}}
+    ,
     {
         "players": {
             0: {
@@ -20,7 +22,7 @@ scenes_arr = [
                 "team": 1,
                 "position": (1032, 932),
                 "position_transformed": [40.26863479614258, 46.887027740478516],
-                # "has_ball": True,
+                "has_ball": True,
             },
             3: {
                 "bbox": (1040, 573, 1091, 693),
@@ -66,7 +68,7 @@ scenes_arr = [
                 "team": 1,
                 "position": (579, 1036),
                 "position_transformed": [33.526309967041016, 51.44015121459961],
-                # "has_ball": True,
+                "has_ball": True,
             },
             2: {
                 "bbox": (1147, 788, 1237, 921),
@@ -118,7 +120,7 @@ scenes_arr = [
                 "team": 1,
                 "position": (453, 1074),
                 "position_transformed": [32.21120071411133, 53.09784698486328],
-                # "has_ball": True,
+                "has_ball": True,
             },
             2: {
                 "bbox": (597, 932, 709, 1068),
@@ -176,7 +178,7 @@ scenes_arr = [
                 "team": 1,
                 "position": (516, 1142),
                 "position_transformed": [33.486427307128906, 55.38705825805664],
-                # "has_ball": True,
+                "has_ball": True,
             },
             4: {
                 "bbox": (638, 525, 691, 637),
@@ -222,7 +224,7 @@ scenes_arr = [
                 "team": 0,
                 "position": (222, 1195),
                 "position_transformed": [30.124143600463867, 55.86209487915039],
-                # "has_ball": True,
+                "has_ball": True,
             },
             3: {
                 "bbox": (552, 551, 597, 677),
@@ -641,6 +643,7 @@ def predict_sequence():
     """
     try:
         data = request.get_json()
+        print("Received data:", data['scene'])
         input_scene = data.get('scene')
         
         if not input_scene:
@@ -651,6 +654,7 @@ def predict_sequence():
         
         # 2. Filter candidate scenes
         candidates = matcher.filter_scenes(query_feats)
+        print("Filtered candidates:", candidates)
         
         # 3. Find best match
         matched_id = matcher.match_formations(query_feats, candidates)
