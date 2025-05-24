@@ -1,0 +1,171 @@
+import 'package:flutter/material.dart';
+import 'dart:async';
+import 'main.dart';
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
+  late AnimationController _fadeAnimationController;
+  late Animation<double> _fadeAnimation;
+  
+  // Additional controller for pulsing effect
+  late AnimationController _pulseAnimationController;
+  late Animation<double> _pulseAnimation;
+
+  // Progress indicator value
+  double _progressValue = 0.0;
+  late Timer _progressTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    // Initialize fade animation controller
+    _fadeAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    
+    // Create fade-in animation
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _fadeAnimationController,
+        curve: Curves.easeIn,
+      ),
+    );
+    
+    // Initialize pulse animation controller
+    _pulseAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    );
+    
+    // Create pulsing animation
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(
+        parent: _pulseAnimationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+    
+    // Setup repeating pulse
+    _pulseAnimationController.repeat(reverse: true);
+    
+    // Start the fade animation
+    _fadeAnimationController.forward();
+    
+    // Setup progress timer
+    _progressTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+      setState(() {
+        if (_progressValue < 1.0) {
+          _progressValue += 0.04; // Increment to reach 1.0 in about 2.5 seconds
+        } else {
+          _progressTimer.cancel();
+        }
+      });
+    });
+    
+    // Navigate to main layout after animation completes
+    Timer(const Duration(milliseconds: 4000), () {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const MainLayout()),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _fadeAnimationController.dispose();
+    _pulseAnimationController.dispose();
+    _progressTimer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
+    return Scaffold(
+      backgroundColor: colorScheme.background,
+      body: Center(
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Animated logo
+              ScaleTransition(
+                scale: _pulseAnimation,
+                child: Container(
+                  width: 150,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colorScheme.primary.withOpacity(0.3),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.sports_soccer,
+                      size: 90,
+                      color: colorScheme.onPrimary,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 40),
+              // App name with improved typography
+              Text(
+                'FIFAI',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                  color: colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Professional Football Tactics',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: colorScheme.onBackground.withOpacity(0.7),
+                ),
+              ),
+              const SizedBox(height: 40),
+              // Progress indicator
+              SizedBox(
+                width: 200,
+                child: LinearProgressIndicator(
+                  value: _progressValue,
+                  backgroundColor: colorScheme.surfaceVariant,
+                  color: colorScheme.secondary,
+                  borderRadius: BorderRadius.circular(4),
+                  minHeight: 6,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Loading...',
+                style: TextStyle(
+                  color: colorScheme.onBackground.withOpacity(0.6),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
