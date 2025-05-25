@@ -4,7 +4,7 @@ class HalfFootballFieldPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Color(0xFF1E6C41)
+      ..color = Color.fromARGB(255, 50, 52, 51)
       ..style = PaintingStyle.fill;
 
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), paint);
@@ -60,6 +60,11 @@ class HalfFootballFieldPainter extends CustomPainter {
     canvas.drawLine(
       Offset(0, size.height),
       Offset(size.width, size.height - 2),
+      linePaint,
+    );
+       canvas.drawLine(
+      Offset(0, 0),
+      Offset(size.width, 2),
       linePaint,
     );
 

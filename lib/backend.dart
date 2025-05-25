@@ -9,6 +9,7 @@ Future<List<List<Map<String, dynamic>>>> sendPlayerData(var jsonSend) async {
   
 
   List<List<Map<String, dynamic>>> allScenes = [];
+  // print('Sending data to server: ${jsonEncode(jsonSend)}');
 
 
   try {
@@ -30,8 +31,11 @@ Future<List<List<Map<String, dynamic>>>> sendPlayerData(var jsonSend) async {
         final List<dynamic> sequence = responseData['sequence'];
         
         // Process each scene in the sequence
+
+
+        print('Received sequence: $sequence');
           
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i <sequence.length; i++) {
           Map<String, dynamic> scene = sequence[i];
           List<Map<String, dynamic>> scenePlayersList = [];
           

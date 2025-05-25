@@ -4,8 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:tactinho/football_field.dart';
 import 'package:tactinho/loading.dart';
+import 'package:tactinho/report.dart';
 import 'package:tactinho/tactics_board.dart';
 import 'package:tactinho/backend.dart';
+import 'package:flutter/rendering.dart';
+import 'dart:io';
+import 'dart:ui';
+import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart';
+import 'package:tactinho/models/tactic_item.dart';
 
 class PrecacheScreen extends StatefulWidget {
   final List<PlayerFormation> scene;
@@ -53,7 +60,7 @@ class _PrecacheScreenState extends State<PrecacheScreen> {
       }
       if (player.number == 3) {
         toSend["goalkeeper"]?['1'] = {
-          "team": 1,
+          "team": 0,
           "position_transformed": [
             60 - (player.position.dy * 60),
             player.position.dx * 90
@@ -61,7 +68,7 @@ class _PrecacheScreenState extends State<PrecacheScreen> {
         };
       } else {
         toSend["players"]?[count.toString()] = {
-          "team": player.number - 1,
+          "team": (player.number== 1) ? 1 : 0,
           "position_transformed": [
             60 - (player.position.dy * 60),
             player.position.dx * 90
@@ -85,6 +92,27 @@ class _PrecacheScreenState extends State<PrecacheScreen> {
       setState(() {
         _done = true;
       });
+    } else {
+      // i want pop up here and navigate back to tactics board
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("No similar tactics found"),
+            content: Text(
+                "No similar tactics found. Please try again with different formations."),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context); // Navigate back to tactics board
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -100,7 +128,7 @@ class _PrecacheScreenState extends State<PrecacheScreen> {
 class TacticsRun extends StatefulWidget {
   final List<Image> pepFrames;
   final String jsonString;
-  TacticsRun({required this.pepFrames, required this.jsonString });
+  TacticsRun({required this.pepFrames, required this.jsonString});
 
   @override
   _TacticsRunState createState() => _TacticsRunState();
@@ -115,15 +143,50 @@ class _TacticsRunState extends State<TacticsRun> {
   int _talkingFrameIndex = 0;
   Timer? _talkingAnimationTimer;
   late List<Image> _pepFrames;
+  int counter = 0;
   Offset? ballPosition;
+  List<TacticItem> tactics = [];
+
+  final GlobalKey _fieldKey = GlobalKey();
 
   final List<String> _descriptions = [
     "Player 1 starts with the ball.",
     "Player 1 moves forward.",
     "Player 1 passes the ball to Player 2.",
-    // "Player 2 moves forward through on goal.",
+    "Player 1 starts with the ball.",
+    "Player 1 moves forward.",
+    "Player 1 passes the ball to Player 2.",
+
+    "Player 2 moves forward through on goal.",
     // "Player 2 shoots -> Goal!"
   ];
+
+  Future<void> _captureFieldImage() async {
+    try {
+      RenderRepaintBoundary boundary =
+          _fieldKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+      var image = await boundary.toImage(pixelRatio: 3.0);
+      ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
+      Uint8List pngBytes = byteData!.buffer.asUint8List();
+
+      final directory =
+          await getApplicationDocumentsDirectory(); // Internal app storage
+      final filePath =
+          '${directory.path}/tactic_${currentFormationIndex++}.png';
+      final file = File(filePath);
+      await file.writeAsBytes(pngBytes);
+      print('Saved screenshot to: $filePath');
+
+      // add to tactics list
+      tactics.add(TacticItem(
+        title: "Tactic ${counter++}",
+        imagePath: filePath,
+        description: _currentDescription,
+      ));
+    } catch (e) {
+      print('Error saving screenshot: $e');
+    }
+  }
 
   @override
   void initState() {
@@ -157,6 +220,7 @@ class _TacticsRunState extends State<TacticsRun> {
 
       await Future.delayed(const Duration(seconds: 2));
       if (!mounted) return;
+      await _captureFieldImage();
 
       setState(() {
         _descriptionOpacity = 0.0;
@@ -167,7 +231,7 @@ class _TacticsRunState extends State<TacticsRun> {
       if (!mounted) return;
     }
     setState(() {
-      _currentDescription = "GOOAAAALLLLL!!";
+      _currentDescription = "finish";
       _descriptionOpacity = 0.0;
       _stopTalkingAnimation();
     });
@@ -206,86 +270,177 @@ class _TacticsRunState extends State<TacticsRun> {
         child: Column(
           children: [
             Expanded(
+              flex: 1,
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  color: Color(0xFF1E6C41),
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Image.asset(
+                      'assets/post.png',
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
               flex: 6,
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   final fieldSize = constraints.biggest;
-                  return Stack(
-                    children: [
-                      CustomPaint(
-                        size: fieldSize,
-                        painter: HalfFootballFieldPainter(),
-                      ),
-                      if (_currentDescription != "")
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          child: SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.4,
-                            height: MediaQuery.of(context).size.height * 0.3,
-                            child: LoadingAnimation(
+                  return RepaintBoundary(
+                    key: _fieldKey,
+                    child: Stack(
+                      children: [
+                        CustomPaint(
+                          size: fieldSize,
+                          painter: HalfFootballFieldPainter(),
+                        ),
+                        if (_currentDescription != "")
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            child: SizedBox(
                               width: MediaQuery.of(context).size.width * 0.4,
                               height: MediaQuery.of(context).size.height * 0.3,
-                              imagePrefix: 'assets/pep/pep_',
-                              frameCount: 29,
-                              imageExtension: '.png',
-                              frameDuration: const Duration(milliseconds: 100),
-                              loop: true,
-                              in_tactics: false,
-                              // currentFrameIndex: _talkingFrameIndex,
+                              child: LoadingAnimation(
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.3,
+                                imagePrefix: 'assets/pep/pep_',
+                                frameCount: 29,
+                                imageExtension: '.png',
+                                frameDuration:
+                                    const Duration(milliseconds: 100),
+                                loop: true,
+                                in_tactics: false,
+                                // currentFrameIndex: _talkingFrameIndex,
+                              ),
                             ),
                           ),
-                        ),
-                      ...currentPlayers.map((player) {
-                        final pos = Offset(
-                          player.position.dx * fieldSize.width,
-                          player.position.dy * fieldSize.height,
-                        );
-                        return AnimatedPositioned(
-                          key: ValueKey(player.number),
-                          duration: Duration(seconds: 1),
-                          left: pos.dx,
-                          top: pos.dy - 15,
-                          child: PlayerDot(
-                            team: player.team,
-                            color: player.color,
-                            number: player.number,
-                            highlight: player.ballpossession,
+                        ...currentPlayers.map((player) {
+                          final pos = Offset(
+                            player.position.dx * fieldSize.width,
+                            player.position.dy * fieldSize.height,
+                          );
+                          return AnimatedPositioned(
+                            key: ValueKey(player.number),
+                            duration: Duration(seconds: 1),
+                            left: pos.dx,
+                            top: pos.dy - 15,
+                            child: PlayerDot(
+                              team: player.team,
+                              color: player.color,
+                              number: player.number,
+                              highlight: player.ballpossession,
+                            ),
+                          );
+                        }),
+                        if (ballPosition != null)
+                          AnimatedPositioned(
+                            duration: Duration(seconds: 1),
+                            left: ballPosition!.dx + 9,
+                            top: ballPosition!.dy - 15,
+                            child: BallWidget(),
                           ),
-                        );
-                      }),
-                      if (ballPosition != null)
-                        AnimatedPositioned(
-                          duration: Duration(seconds: 1),
-                          left: ballPosition!.dx + 9,
-                          top: ballPosition!.dy - 15,
-                          child: BallWidget(),
-                        ),
-                    ],
+                        (_currentDescription == "finish")
+                            ? Positioned(
+                                bottom: 20,
+                                right: 10,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          currentFormationIndex = 0;
+                                          _currentDescription = "";
+                                          _descriptionOpacity = 0.0;
+                                          counter = 0;
+                                          tactics.clear();
+                                        });
+                                        Future.delayed(
+                                            const Duration(milliseconds: 100),
+                                            _startAnimationLoop);
+                                      },
+                                      child:Row(children: [
+                                        
+                                        
+                                         Icon(Icons.refresh,
+                                        size: 15,
+                                      ),
+                                      
+                                      Text("Reset Tactics",
+                                        style: TextStyle(fontSize: 15),
+                                      )
+                                      
+                                      ]),
+                                    ),
+                                    SizedBox(height: 2),
+                                    ElevatedButton(
+
+                                      onPressed: () {
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                TacticsReportPage(
+                                              tactics: tactics,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Text("View Report",
+                                        style: TextStyle(fontSize: 15),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : SizedBox(),
+                      ],
+                    ),
                   );
                 },
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: (_currentDescription != "")
-                  ? Center(
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.7),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          _currentDescription,
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    )
-                  : SizedBox(),
-            )
+            // Expanded(
+            //   flex: 1,
+            //   child: (_currentDescription != "")
+            //       ?(_currentDescription =="finish")?
+            //   ElevatedButton(
+            //           onPressed: () {
+            //             Navigator.pushReplacement(
+            //               context,
+            //               MaterialPageRoute(
+            //                 builder: (context) => TacticsReportPage(
+            //                   tactics: tactics,),
+            //               ),
+            //             );
+            //           },
+            //           child: Text("View report"),
+            //         ):
+
+            //        Center(
+            //           child: Container(
+            //             padding:
+            //                 EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            //             decoration: BoxDecoration(
+            //               color: Colors.black.withOpacity(0.7),
+            //               borderRadius: BorderRadius.circular(12),
+            //             ),
+            //             child: Text(
+            //               _currentDescription,
+            //               style: TextStyle(color: Colors.white, fontSize: 16),
+            //               textAlign: TextAlign.center,
+            //             ),
+            //           ),
+            //         )
+            //       : SizedBox(),
+            // )
           ],
         ),
       ),
@@ -334,11 +489,15 @@ class PlayerDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 30,
-      height: 30,
+      width: MediaQuery.of(context).size.width * 0.06,
+      height: MediaQuery.of(context).size.width * 0.06,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: (team == 1) ? Colors.yellow :(team==2)? Color.fromARGB(255, 255, 64, 0):Color.fromARGB(255, 0, 64, 255),
+        color: (team == 1)
+            ? Colors.yellow
+            : (team == 2)
+                ? Color.fromARGB(255, 255, 64, 0)
+                : Color.fromARGB(255, 0, 64, 255),
         shape: BoxShape.circle,
         border:
             Border.all(color: highlight ? Colors.red : Colors.white, width: 3),
@@ -351,8 +510,8 @@ class BallWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 15,
-      height: 15,
+      width: MediaQuery.of(context).size.width * 0.025,
+      height: MediaQuery.of(context).size.width * 0.025,
       decoration: BoxDecoration(
         color: Colors.deepOrangeAccent,
         shape: BoxShape.circle,

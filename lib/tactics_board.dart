@@ -72,45 +72,49 @@ class _TacticsBoardState extends State<TacticsBoard> {
                 ),
                 // Bench Players
                 Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(3, (index) {
-                      final player = PlayerFormation(
-                        color: Colors.primaries[index],
-                        number: index + 1,
-                      );
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-
-                        child: player.number == 3 && goalkeeper_selected
-                            ? Opacity(
-                                opacity: 0.4,
-                              child: PlayerCircle(
-                                  color: player.color,
-                                  number: player.number,
-                                ),
-                            )
-                            : Draggable<PlayerFormation>(
-                                data: player,
-                                feedback: PlayerCircle(
-                                  color: player.color,
-                                  number: player.number,
-                                ),
-                                childWhenDragging: Opacity(
-                                  opacity: 0.4,
-                                  child: PlayerCircle(
-                                    color: player.color,
-                                    number: player.number,
-                                  ),
-                                ),
-                                child: PlayerCircle(
-                                  color: player.color,
-                                  number: player.number,
-                                ),
-                              ),
-                      );
-                    }),
+                  child: LayoutBuilder(
+    builder: (context, constraints) {
+      return Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 4,
+        children: List.generate(3, (index) {
+          final player = PlayerFormation(
+            color: Colors.primaries[index],
+            number: index + 1,
+          );
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: player.number == 3 && goalkeeper_selected
+                ? Opacity(
+                    opacity: 0.4,
+                    child: PlayerCircle(
+                      color: player.color,
+                      number: player.number,
+                    ),
+                  )
+                : Draggable<PlayerFormation>(
+                    data: player,
+                    feedback: PlayerCircle(
+                      color: player.color,
+                      number: player.number,
+                    ),
+                    childWhenDragging: Opacity(
+                      opacity: 0.4,
+                      child: PlayerCircle(
+                        color: player.color,
+                        number: player.number,
+                      ),
+                    ),
+                    child: PlayerCircle(
+                      color: player.color,
+                      number: player.number,
+                    ),
                   ),
+          );
+        }),
+      );
+    },
+  ),
                 ),
                 // Clear Button
                 Expanded(
@@ -273,7 +277,7 @@ class _TacticsBoardState extends State<TacticsBoard> {
                       ),
                     );
                   } else {
-                    Navigator.of(context).push(
+                    Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
                         builder: (context) => PrecacheScreen(
                             scene: fieldPlayers), // Replace with your widget
@@ -340,8 +344,8 @@ class PlayerCircle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 30,
-      height: 30,
+      width: MediaQuery.sizeOf(context).width * 0.07,
+      height: MediaQuery.sizeOf(context).height * 0.07,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: (number == 1)

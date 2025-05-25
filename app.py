@@ -443,8 +443,8 @@ class SceneMatcher:
         """Extract only formation-relevant features (invariant to player ordering)."""
         features = {}
         players = scene["players"]
-        team1 = [p for p in players.values() if p["team"] == 0]
-        team2 = [p for p in players.values() if p["team"] == 1]
+        team1 = [p for p in players.values() if p["team"] == 1]
+        team2 = [p for p in players.values() if p["team"] == 0]
 
         # Team sizes (critical for filtering)
         features["team1_size"] = len(team1)
@@ -606,7 +606,8 @@ class SceneMatcher:
                     }
                 )
                 scene_id += 1
-
+                
+        print("Processed scenes:", all_scenes)
         return all_scenes, features_obj
     
     def get_sequence_from_match(self, initial_scene_id):
@@ -622,8 +623,10 @@ class SceneMatcher:
         return sequence
 
 # Initialize with your training data
+scenes_arr=load_sequences_from_json("transformed_tracks.json")
+# print("Loaded scenes:", scenes_arr)
 
-matcher = SceneMatcher([scenes_arr[:7]])  # Pass your actual training sequences
+matcher = SceneMatcher([scenes_arr])  # Pass your actual training sequences
 
 @app.route('/api/predict_sequence', methods=['POST'])
 def predict_sequence():
