@@ -7,7 +7,7 @@ from sklearn.neighbors import NearestNeighbors
 import json
 
 scenes_arr = [
-    {'players': {'0': {'team': 0, 'position_transformed': [33.99487836107551, 27.367624810892618], 'has_ball': True}, '1': {'team': 0, 'position_transformed': [33.6875800256081, 61.6792738275342]}, '2': {'team': 1, 'position_transformed': [45.05761843790012, 27.231467473525004]}}, 'referees': {}, 'ball': {'1': {'conf': 0.11, 'position_transformed': [33.99487836107551, 27.367624810892618]}}, 'goalkeeper': {'1': {'team': 1, 'position_transformed': [59.116517285531366, 41.52798789712562]}}, 'goalpost': {}}
+    {'players': {'0': {'team': 0, 'position_transformed': [33.99487836107551, 27.367624810892618], 'has_ball': True}, '1': {'team': 0, 'position_transformed': [33.6875800256081, 61.6792738275342]}, '2': {'team': 1, 'position_transformed': [45.05761843790012, 27.231467473525004]}}, 'referees': {}, 'ball': {'1': {'conf': 0.11, 'position_transformed': [33.99487836107551, 27.367624810892618]}}, 'goalkeeper': {'3': {'team': 1, 'position_transformed': [59.116517285531366, 41.52798789712562]}}, 'goalpost': {}}
     ,
     {
         "players": {
@@ -24,7 +24,7 @@ scenes_arr = [
                 "position_transformed": [40.26863479614258, 46.887027740478516],
                 "has_ball": True,
             },
-            3: {
+            2: {
                 "bbox": (1040, 573, 1091, 693),
                 "team": 1,
                 "position": (1065, 693),
@@ -41,7 +41,7 @@ scenes_arr = [
             }
         },
         "goalkeeper": {
-            2: {
+            3: {
                 "bbox": (2128, 735, 2192, 867),
                 "conf": None,
                 "position": (2160, 867),
@@ -76,12 +76,7 @@ scenes_arr = [
                 "position": (1192, 921),
                 "position_transformed": [40.126380920410156, 48.61543655395508],
             },
-            4: {
-                "bbox": (987, 561, 1049, 667),
-                "team": 1,
-                "position": (1018, 667),
-                "position_transformed": [37.659603118896484, 38.218502044677734],
-            },
+
         },
         "referees": {},
         "ball": {
@@ -128,12 +123,7 @@ scenes_arr = [
                 "position": (653, 1068),
                 "position_transformed": [34.11555099487305, 53.242427825927734],
             },
-            4: {
-                "bbox": (968, 543, 1045, 646),
-                "team": 1,
-                "position": (1006, 646),
-                "position_transformed": [36.758758544921875, 38.33705139160156],
-            },
+
         },
         "referees": {},
         "ball": {

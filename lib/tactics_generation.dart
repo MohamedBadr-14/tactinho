@@ -19,6 +19,7 @@ class _PrecacheScreenState extends State<PrecacheScreen> {
   bool _done = false;
   List<Player> currentPlayers = [];
   List<PlayerFormation> scene = [];
+  String jsonString = "";
 
   @override
   void didChangeDependencies() {
@@ -60,7 +61,7 @@ class _PrecacheScreenState extends State<PrecacheScreen> {
         };
       } else {
         toSend["players"]?[count.toString()] = {
-          "team": player.number - 1 ,
+          "team": player.number - 1,
           "position_transformed": [
             60 - (player.position.dy * 60),
             player.position.dx * 90
@@ -78,13 +79,19 @@ class _PrecacheScreenState extends State<PrecacheScreen> {
     var jsonToSend = sceneToJson();
     // final jsonString = jsonEncode(jsonToSend);
     final response = await sendPlayerData(jsonToSend);
-    
+    if (response.length > 0) {
+      jsonString = jsonEncode(response);
+
+      setState(() {
+        _done = true;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     if (_done) {
-      return TacticsRun(pepFrames: pepFrames);
+      return TacticsRun(pepFrames: pepFrames, jsonString: jsonString);
     }
     return const LoadingScreen();
   }
@@ -92,7 +99,8 @@ class _PrecacheScreenState extends State<PrecacheScreen> {
 
 class TacticsRun extends StatefulWidget {
   final List<Image> pepFrames;
-  TacticsRun({required this.pepFrames});
+  final String jsonString;
+  TacticsRun({required this.pepFrames, required this.jsonString });
 
   @override
   _TacticsRunState createState() => _TacticsRunState();
@@ -113,8 +121,8 @@ class _TacticsRunState extends State<TacticsRun> {
     "Player 1 starts with the ball.",
     "Player 1 moves forward.",
     "Player 1 passes the ball to Player 2.",
-    "Player 2 moves forward through on goal.",
-    "Player 2 shoots -> Goal!"
+    // "Player 2 moves forward through on goal.",
+    // "Player 2 shoots -> Goal!"
   ];
 
   @override
@@ -170,9 +178,9 @@ class _TacticsRunState extends State<TacticsRun> {
     _talkingAnimationTimer =
         Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (!mounted) return;
-      setState(() {
-        _talkingFrameIndex = (_talkingFrameIndex + 1) % _pepFrames.length;
-      });
+      // setState(() {
+      //   // _talkingFrameIndex = (_talkingFrameIndex + 1) % _pepFrames.length;
+      // });
     });
   }
 
@@ -182,55 +190,7 @@ class _TacticsRunState extends State<TacticsRun> {
   }
 
   void _loadFormationsFromJson() {
-    const jsonString = '''
-    [
-      [
-        {"color": 4294901760, "number": 1, "position": {"dx": 0.7, "dy": 0.7}, "ballpossession": true , "team": 1},
-        {"color": 4278190080, "number": 2, "position": {"dx": 0.3, "dy": 0.7}, "ballpossession": false , "team": 1},
-        {"color": 4278255360, "number": 3, "position": {"dx": 0.5, "dy": 0.4}, "ballpossession": false , "team": 0},
-        {"color": 4278255360, "number": 4, "position": {"dx": 0.45, "dy": 0.05}, "ballpossession": false , "team": 0},
-        {"color": 4278255360, "number": 5, "position": {"dx": 0.4, "dy": -0.2}, "ballpossession": false , "team": 0}
-
-      ],
-      [
-        {"color": 4294901760, "number": 1, "position": {"dx": 0.7, "dy": 0.6}, "ballpossession": true , "team": 1},
-        {"color": 4278190080, "number": 2, "position": {"dx": 0.3, "dy": 0.6}, "ballpossession": false , "team": 1},
-        {"color": 4278255360, "number": 3, "position": {"dx": 0.6, "dy": 0.5}, "ballpossession": false , "team": 0},
-        {"color": 4278255360, "number": 4, "position": {"dx": 0.45, "dy": 0.05}, "ballpossession": false , "team": 0},
-        {"color": 4278255360, "number": 5, "position": {"dx": 0.4, "dy": -0.2}, "ballpossession": false , "team": 0}
-
-
-      ],
-      [
-        {"color": 4294901760, "number": 1, "position": {"dx": 0.7, "dy": 0.5}, "ballpossession": false , "team": 1},
-        {"color": 4278190080, "number": 2, "position": {"dx": 0.3, "dy": 0.4}, "ballpossession": true , "team": 1},
-        {"color": 4278255360, "number": 3, "position": {"dx": 0.6, "dy": 0.45}, "ballpossession": false , "team": 0},
-        {"color": 4278255360, "number": 4, "position": {"dx": 0.45, "dy": 0.05}, "ballpossession": false , "team": 0},
-        {"color": 4278255360, "number": 5, "position": {"dx": 0.4, "dy": -0.2}, "ballpossession": false , "team": 0}
-
-
-      ],
-      [
-      
-        {"color": 4294901760, "number": 1, "position": {"dx": 0.7, "dy": 0.4}, "ballpossession": false , "team": 1},
-        {"color": 4278190080, "number": 2, "position": {"dx": 0.3, "dy": 0.3}, "ballpossession": true , "team": 1},
-        {"color": 4278255360, "number": 3, "position": {"dx": 0.5, "dy": 0.4}, "ballpossession": false , "team": 0},
-        {"color": 4278255360, "number": 4, "position": {"dx": 0.4, "dy": 0.05}, "ballpossession": false , "team": 0},
-        {"color": 4278255360, "number": 5, "position": {"dx": 0.4, "dy": -0.2}, "ballpossession": false , "team": 0}
-
-      ],
-      [
-      
-        {"color": 4294901760, "number": 1, "position": {"dx": 0.7, "dy": 0.5}, "ballpossession": false , "team": 1},
-        {"color": 4278190080, "number": 2, "position": {"dx": 0.3, "dy": 0.3}, "ballpossession": false , "team": 1},
-        {"color": 4278255360, "number": 3, "position": {"dx": 0.5, "dy": 0.4}, "ballpossession": false , "team": 0},
-        {"color": 4278255360, "number": 4, "position": {"dx": 0.45, "dy": 0.05}, "ballpossession": false , "team": 0},
-        {"color": 4278255360, "number": 5, "position": {"dx": 0.75, "dy": -0.2}, "ballpossession": true , "team": 0}
-
-      ]
-    ]
-    ''';
-    final List<dynamic> jsonData = jsonDecode(jsonString);
+    final List<dynamic> jsonData = jsonDecode(widget.jsonString);
     formations = jsonData
         .map<List<Player>>((formation) =>
             formation.map<Player>((p) => Player.fromJson(p)).toList())
@@ -378,7 +338,7 @@ class PlayerDot extends StatelessWidget {
       height: 30,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: (team == 1) ? Colors.yellow : Colors.blue,
+        color: (team == 1) ? Colors.yellow :(team==2)? Color.fromARGB(255, 255, 64, 0):Color.fromARGB(255, 0, 64, 255),
         shape: BoxShape.circle,
         border:
             Border.all(color: highlight ? Colors.red : Colors.white, width: 3),
