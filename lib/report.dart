@@ -40,6 +40,7 @@ Future<void> _generatePdf(BuildContext context) async {
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
                 pw.Container(
+                  width: double.infinity,
                   decoration: pw.BoxDecoration(
                     border: pw.Border.all(width: 1),
                     borderRadius: pw.BorderRadius.circular(8),
@@ -64,11 +65,14 @@ Future<void> _generatePdf(BuildContext context) async {
                       pw.SizedBox(height: 12),
                       // 🖼️ Add image
                       if (tactic.imagePath.isNotEmpty)
-                        pw.Image(
-                          pw.MemoryImage(File(tactic.imagePath).readAsBytesSync()),
-                          width: 400, // scale as needed
-                          fit: pw.BoxFit.contain,
-                        ),
+                        pw.Center(
+    child: pw.Image(
+      pw.MemoryImage(File(tactic.imagePath).readAsBytesSync()),
+      height: 200,
+      width: 300,
+      fit: pw.BoxFit.contain,
+    ),
+  ),
                     ],
                   ),
                 ),
@@ -92,15 +96,16 @@ Future<void> _generatePdf(BuildContext context) async {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+
         title: Text(
-          'Tactics Report',
+          'Tactics details',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.white,
           ),
         ),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor:const Color(0xFF1E6C41),
         elevation: 0,
         actions: [
           IconButton(

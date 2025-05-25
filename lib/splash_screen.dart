@@ -35,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _fadeAnimationController,
-        curve: Curves.easeIn,
+        curve: Curves.easeInOutCirc,
       ),
     );
     
@@ -49,7 +49,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
       CurvedAnimation(
         parent: _pulseAnimationController,
-        curve: Curves.easeInOut,
+        curve: Curves.elasticIn,
       ),
     );
     
@@ -60,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     _fadeAnimationController.forward();
     
     // Setup progress timer
-    _progressTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
+    _progressTimer = Timer.periodic(const Duration(milliseconds: 5000), (timer) {
       setState(() {
         if (_progressValue < 1.0) {
           _progressValue += 0.04; // Increment to reach 1.0 in about 2.5 seconds
@@ -71,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     });
     
     // Navigate to main layout after animation completes
-    Timer(const Duration(milliseconds: 1000), () {
+    Timer(const Duration(milliseconds: 5000), () {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const MainLayout()),
       );
@@ -91,7 +91,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     final colorScheme = Theme.of(context).colorScheme;
     
     return Scaffold(
-      backgroundColor: colorScheme.background,
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -101,25 +101,28 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
               // Animated logo
               ScaleTransition(
                 scale: _pulseAnimation,
-                child: Container(
-                  width: 150,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: colorScheme.primary,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: colorScheme.primary.withOpacity(0.3),
-                        blurRadius: 15,
-                        offset: const Offset(0, 8),
+                child: Center(
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    // decoration: BoxDecoration(
+                    //   color: colorScheme.primary,
+                    //   borderRadius: BorderRadius.circular(20),
+                      // boxShadow: [
+                      //   BoxShadow(
+                      //     color: colorScheme.primary.withOpacity(0.3),
+                      //     blurRadius: 15,
+                      //     offset: const Offset(0, 8),
+                      //   ),
+                      // ],
+                    // ),
+                    child: Center(
+                      child: Image.asset(
+                        'assets/logo.png', // Replace with your logo asset
+                        width: 200,
+                        height: 200,
+                        fit: BoxFit.cover,
                       ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Icon(
-                      Icons.sports_soccer,
-                      size: 90,
-                      color: colorScheme.onPrimary,
                     ),
                   ),
                 ),
@@ -127,7 +130,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
               const SizedBox(height: 40),
               // App name with improved typography
               Text(
-                'FIFAI',
+                '',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -137,31 +140,31 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
               ),
               const SizedBox(height: 8),
               Text(
-                'Professional Football Tactics',
+                'powered by Team 17',
                 style: TextStyle(
                   fontSize: 16,
-                  color: colorScheme.onBackground.withOpacity(0.7),
+                  color: Colors.grey.shade600,
                 ),
               ),
               const SizedBox(height: 40),
               // Progress indicator
-              SizedBox(
-                width: 200,
-                child: LinearProgressIndicator(
-                  value: _progressValue,
-                  backgroundColor: colorScheme.surfaceVariant,
-                  color: colorScheme.secondary,
-                  borderRadius: BorderRadius.circular(4),
-                  minHeight: 6,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Loading...',
-                style: TextStyle(
-                  color: colorScheme.onBackground.withOpacity(0.6),
-                ),
-              ),
+              // SizedBox(
+              //   width: 200,
+              //   child: LinearProgressIndicator(
+              //     value: _progressValue,
+              //     backgroundColor: colorScheme.surfaceVariant,
+              //     color: colorScheme.secondary,
+              //     borderRadius: BorderRadius.circular(4),
+              //     minHeight: 6,
+              //   ),
+              // ),
+              // const SizedBox(height: 16),
+              // Text(
+              //   'Loading...',
+              //   style: TextStyle(
+              //     color: colorScheme.onBackground.withOpacity(0.6),
+              //   ),
+              // ),
             ],
           ),
         ),

@@ -266,25 +266,25 @@ class _TacticsRunState extends State<TacticsRun> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: const Color.fromARGB(255, 255, 255, 255),
+        color: const Color(0xFF1E6C41),
         child: Column(
           children: [
-            Expanded(
-              flex: 1,
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  color: Color(0xFF1E6C41),
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Image.asset(
-                      'assets/post.png',
-                      fit: BoxFit.fill,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+         Expanded(
+  flex: 1,
+  child: Container(
+    padding: const EdgeInsets.all(16.0),
+    alignment: Alignment.center,
+    child: Text(
+      "Tactics Generation",
+      style: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
+    ),
+  )
+  
+),
             Expanded(
               flex: 6,
               child: LayoutBuilder(
@@ -369,9 +369,7 @@ class _TacticsRunState extends State<TacticsRun> {
                                       child:Row(children: [
                                         
                                         
-                                         Icon(Icons.refresh,
-                                        size: 15,
-                                      ),
+                               
                                       
                                       Text("Reset Tactics",
                                         style: TextStyle(fontSize: 15),
@@ -379,7 +377,7 @@ class _TacticsRunState extends State<TacticsRun> {
                                       
                                       ]),
                                     ),
-                                    SizedBox(height: 2),
+                                    SizedBox(height: 3),
                                     ElevatedButton(
 
                                       onPressed: () {

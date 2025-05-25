@@ -344,8 +344,8 @@ class PlayerCircle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.sizeOf(context).width * 0.07,
-      height: MediaQuery.sizeOf(context).height * 0.07,
+      width: MediaQuery.sizeOf(context).width * 0.05,
+      height: MediaQuery.sizeOf(context).height * 0.05,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: (number == 1)
