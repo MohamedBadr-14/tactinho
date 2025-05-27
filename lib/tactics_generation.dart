@@ -68,7 +68,7 @@ class _PrecacheScreenState extends State<PrecacheScreen> {
         };
       } else {
         toSend["players"]?[count.toString()] = {
-          "team": (player.number== 1) ? 1 : 0,
+          "team": (player.number == 1) ? 1 : 0,
           "position_transformed": [
             60 - (player.position.dy * 60),
             player.position.dx * 90
@@ -136,6 +136,8 @@ class TacticsRun extends StatefulWidget {
 
 class _TacticsRunState extends State<TacticsRun> {
   List<List<Player>> formations = [];
+  // action values
+  List<int> actions = [];
   List<Player> currentPlayers = [];
   int currentFormationIndex = 0;
   String _currentDescription = "";
@@ -156,10 +158,42 @@ class _TacticsRunState extends State<TacticsRun> {
     "Player 1 starts with the ball.",
     "Player 1 moves forward.",
     "Player 1 passes the ball to Player 2.",
-
+    "Player 2 moves forward through on goal.",
+    "Player 2 moves forward through on goal.",
+    "Player 2 moves forward through on goal.",
+    "Player 2 moves forward through on goal.",
+    "Player 2 moves forward through on goal.",
+    "Player 2 moves forward through on goal.",
+    "Player 2 moves forward through on goal.",
+    "Player 2 moves forward through on goal.",
+    "Player 2 moves forward through on goal.",
+    "Player 2 moves forward through on goal.",
+    "Player 2 moves forward through on goal.",
+    "Player 2 moves forward through on goal.",
+    "Player 2 moves forward through on goal.",
     "Player 2 moves forward through on goal.",
     // "Player 2 shoots -> Goal!"
   ];
+
+  final Map<int, String> actionList = {
+    0: "Pass Forward", // Basa Foo2
+    1: "Pass Forward-Right", // Basa Foo2 ymeen
+    2: "Pass Right", // Basa Ymeen
+    3: "Pass Backward-Right", // Basa Taht ymeen
+    4: "Pass Backward", // Basa Taht
+    5: "Pass Backward-Left", // Basa Taht shmal
+    6: "Pass Left", // Basa Shmal
+    7: "Pass Forward-Left", // Basa Foo2 shmal
+    8: "Dribble Forward", // dribble Foo2
+    9: "Dribble Forward-Right", // dribble Foo2 ymeen
+    10: "Dribble Right", // dribble Ymeen
+    11: "Dribble Backward-Right", // dribble Taht ymeen
+    12: "Dribble Backward", // dribble Taht
+    13: "Dribble Backward-Left", // dribble Taht shmal
+    14: "Dribble Left", // dribble Shmal
+    15: "Dribble Forward-Left", // dribble Foo2 shmal
+    16: "Shoot", // shoot
+  };
 
   Future<void> _captureFieldImage() async {
     try {
@@ -206,8 +240,14 @@ class _TacticsRunState extends State<TacticsRun> {
     for (int i = 0; i < formations.length && mounted; i++) {
       setState(() {
         // currentFormationIndex = (currentFormationIndex + i) % formations.length;
+        // draw actions[i];
+        if (actions.isNotEmpty) {
+          _currentDescription = actionList[actions[i]] ?? "Unknown Action";
+        } else {
+          _currentDescription = _descriptions[i];
+        }
         currentPlayers = formations[i];
-        _currentDescription = _descriptions[i];
+        // _currentDescription = _descriptions[i];
         _descriptionOpacity = 1.0;
         final ballPlayer = currentPlayers.firstWhere((p) => p.ballpossession,
             orElse: () => currentPlayers[0]);
@@ -255,11 +295,33 @@ class _TacticsRunState extends State<TacticsRun> {
 
   void _loadFormationsFromJson() {
     final List<dynamic> jsonData = jsonDecode(widget.jsonString);
-    formations = jsonData
-        .map<List<Player>>((formation) =>
-            formation.map<Player>((p) => Player.fromJson(p)).toList())
-        .toList();
+    print("JSON Data: $jsonData");
+
+    formations = jsonData.map<List<Player>>((formation) {
+      // Extract action value if present
+      int? actionValue;
+      final List<Player> players = [];
+
+      for (var p in formation) {
+        if (p is Map && p.containsKey('action')) {
+          actionValue = p['action'];
+        } else {
+          players.add(Player.fromJson(p));
+        }
+      }
+
+      // Store action somewhere if needed
+      if (actionValue != null) {
+        print("Action for this formation: $actionValue");
+        actions.add(actionValue);
+        // You could store this in a separate list or map if needed
+      }
+
+      return players;
+    }).toList();
+
     currentPlayers = formations.first;
+    print("Actions: $actions");
   }
 
   @override
@@ -269,22 +331,20 @@ class _TacticsRunState extends State<TacticsRun> {
         color: const Color(0xFF1E6C41),
         child: Column(
           children: [
-         Expanded(
-  flex: 1,
-  child: Container(
-    padding: const EdgeInsets.all(16.0),
-    alignment: Alignment.center,
-    child: Text(
-      "Tactics Generation",
-      style: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
-    ),
-  )
-  
-),
+            Expanded(
+                flex: 1,
+                child: Container(
+                  padding: const EdgeInsets.all(16.0),
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Tactics Generation",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                )),
             Expanded(
               flex: 6,
               child: LayoutBuilder(
@@ -345,6 +405,31 @@ class _TacticsRunState extends State<TacticsRun> {
                             top: ballPosition!.dy - 15,
                             child: BallWidget(),
                           ),
+                        // Add description text here - before the finish buttons
+                        if (_currentDescription != "" &&
+                            _currentDescription != "finish")
+                          Positioned(
+                            bottom: 70,
+                            left: 20,
+                            right: 20,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.7),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                _currentDescription,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
                         (_currentDescription == "finish")
                             ? Positioned(
                                 bottom: 20,
@@ -366,20 +451,15 @@ class _TacticsRunState extends State<TacticsRun> {
                                             const Duration(milliseconds: 100),
                                             _startAnimationLoop);
                                       },
-                                      child:Row(children: [
-                                        
-                                        
-                               
-                                      
-                                      Text("Reset Tactics",
-                                        style: TextStyle(fontSize: 15),
-                                      )
-                                      
+                                      child: Row(children: [
+                                        Text(
+                                          "Reset Tactics",
+                                          style: TextStyle(fontSize: 15),
+                                        )
                                       ]),
                                     ),
                                     SizedBox(height: 3),
                                     ElevatedButton(
-
                                       onPressed: () {
                                         Navigator.pushReplacement(
                                           context,
@@ -391,7 +471,8 @@ class _TacticsRunState extends State<TacticsRun> {
                                           ),
                                         );
                                       },
-                                      child: Text("View Report",
+                                      child: Text(
+                                        "View Report",
                                         style: TextStyle(fontSize: 15),
                                       ),
                                     ),
@@ -461,6 +542,16 @@ class Player {
       required this.team});
 
   factory Player.fromJson(Map<String, dynamic> json) {
+    if (json.containsKey('action') && !json.containsKey('number')) {
+      // Return a default player with action data
+      return Player(
+        color: Colors.transparent, // Make it invisible
+        number: -1, // Special number to indicate action
+        position: Offset(0, 0), // Off-screen position
+        ballpossession: false,
+        team: -1, // Special team for action
+      );
+    }
     return Player(
       color: Color(json['color']),
       number: json['number'],
@@ -487,8 +578,8 @@ class PlayerDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.06,
-      height: MediaQuery.of(context).size.width * 0.06,
+      width: MediaQuery.of(context).size.width * 0.03,
+      height: MediaQuery.of(context).size.width * 0.03,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: (team == 1)
@@ -508,8 +599,8 @@ class BallWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.025,
-      height: MediaQuery.of(context).size.width * 0.025,
+      width: MediaQuery.of(context).size.width * 0.015,
+      height: MediaQuery.of(context).size.width * 0.015,
       decoration: BoxDecoration(
         color: Colors.deepOrangeAccent,
         shape: BoxShape.circle,

@@ -13,6 +13,9 @@ class _TacticsBoardState extends State<TacticsBoard> {
   List<PlayerFormation> fieldPlayers = [];
   var has_Ball = false;
   var goalkeeper_selected = false;
+  // Add variables to track mouse position
+  Offset? _mousePosition;
+  List<double>? _transformedPosition;
 
   void _undoLastPlayer() {
     if (fieldPlayers.isNotEmpty) {
@@ -73,48 +76,48 @@ class _TacticsBoardState extends State<TacticsBoard> {
                 // Bench Players
                 Expanded(
                   child: LayoutBuilder(
-    builder: (context, constraints) {
-      return Wrap(
-        alignment: WrapAlignment.center,
-        spacing: 4,
-        children: List.generate(3, (index) {
-          final player = PlayerFormation(
-            color: Colors.primaries[index],
-            number: index + 1,
-          );
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 2),
-            child: player.number == 3 && goalkeeper_selected
-                ? Opacity(
-                    opacity: 0.4,
-                    child: PlayerCircle(
-                      color: player.color,
-                      number: player.number,
-                    ),
-                  )
-                : Draggable<PlayerFormation>(
-                    data: player,
-                    feedback: PlayerCircle(
-                      color: player.color,
-                      number: player.number,
-                    ),
-                    childWhenDragging: Opacity(
-                      opacity: 0.4,
-                      child: PlayerCircle(
-                        color: player.color,
-                        number: player.number,
-                      ),
-                    ),
-                    child: PlayerCircle(
-                      color: player.color,
-                      number: player.number,
-                    ),
+                    builder: (context, constraints) {
+                      return Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 4,
+                        children: List.generate(3, (index) {
+                          final player = PlayerFormation(
+                            color: Colors.primaries[index],
+                            number: index + 1,
+                          );
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 2),
+                            child: player.number == 3 && goalkeeper_selected
+                                ? Opacity(
+                                    opacity: 0.4,
+                                    child: PlayerCircle(
+                                      color: player.color,
+                                      number: player.number,
+                                    ),
+                                  )
+                                : Draggable<PlayerFormation>(
+                                    data: player,
+                                    feedback: PlayerCircle(
+                                      color: player.color,
+                                      number: player.number,
+                                    ),
+                                    childWhenDragging: Opacity(
+                                      opacity: 0.4,
+                                      child: PlayerCircle(
+                                        color: player.color,
+                                        number: player.number,
+                                      ),
+                                    ),
+                                    child: PlayerCircle(
+                                      color: player.color,
+                                      number: player.number,
+                                    ),
+                                  ),
+                          );
+                        }),
+                      );
+                    },
                   ),
-          );
-        }),
-      );
-    },
-  ),
                 ),
                 // Clear Button
                 Expanded(
@@ -147,43 +150,73 @@ class _TacticsBoardState extends State<TacticsBoard> {
                 final fieldSize = constraints.biggest;
                 return Stack(
                   children: [
-                    // Drag Target
-                    DragTarget<PlayerFormation>(
-                      onAcceptWithDetails: (details) {
-                        final localOffset = details.offset -
-                            Offset(
-                              0,
-                              AppBar().preferredSize.height +
-                                  MediaQuery.of(context).padding.top,
-                            );
-                        final dx =
-                            (localOffset.dx / fieldSize.width).clamp(0.0, 1.0);
-                        final dy =
-                            (localOffset.dy / fieldSize.height).clamp(0.0, 1.0);
+                    // Mouse listener for tracking position
+                    MouseRegion(
+                      onHover: (event) {
+                        final localOffset = event.localPosition;
+                        final dx = (localOffset.dx / fieldSize.width).clamp(0.0, 1.0);
+                        final dy = (localOffset.dy / fieldSize.height).clamp(0.0, 1.0);
+                        
+                        // Update without forcing a full rebuild
+                        if (mounted) {
+                          setState(() {
+                            _mousePosition = localOffset;
+                            _transformedPosition = [
+                              60 - (dy * 60),  // y-coordinate (0-60)
+                              dx * 90,         // x-coordinate (0-90)
+                            ];
+                          });
+                        }
+                      },
+                      onExit: (event) {
+                        if (mounted) {
+                          setState(() {
+                            _mousePosition = null;
+                            _transformedPosition = null;
+                          });
+                        }
+                      },
+                      child: DragTarget<PlayerFormation>(
+                        onAcceptWithDetails: (details) {
+                          final localOffset = details.offset -
+                              Offset(
+                                0,
+                                AppBar().preferredSize.height +
+                                    MediaQuery.of(context).padding.top,
+                              );
+                          final dx =
+                              (localOffset.dx / fieldSize.width).clamp(0.0, 1.0);
+                          final dy =
+                              (localOffset.dy / fieldSize.height).clamp(0.0, 1.0);
 
-                        setState(() {
-                          // print(fieldPlayers);
-                          if (details.data.number == 3 &&
-                              !goalkeeper_selected) {
-                            goalkeeper_selected = true;
-                          }
-                          fieldPlayers.add(
-                            details.data.copyWith(
-                              position: Offset(dx, dy),
-                            ),
+                          final positionTransformed = [
+                            60 - (dy * 60),
+                            dx * 90
+                          ];
+                          setState(() {
+                            // print(fieldPlayers);
+                            if (details.data.number == 3 &&
+                                !goalkeeper_selected) {
+                              goalkeeper_selected = true;
+                            }
+                            fieldPlayers.add(
+                              details.data.copyWith(
+                                position: Offset(dx, dy),
+                              ),
+                            );
+                          });
+                          print('Player added: ${details.data.number} at position: $positionTransformed');
+                        },
+                        builder: (context, candidateData, rejectedData) {
+                          return CustomPaint(
+                            size: fieldSize,
+                            painter: HalfFootballFieldPainter(),
                           );
-                        });
-                      },
-                      builder: (context, candidateData, rejectedData) {
-                        return CustomPaint(
-                          size: fieldSize,
-                          painter: HalfFootballFieldPainter(),
-                        );
-                      },
+                        },
+                      ),
                     ),
 
                     // Draw Players
-
                     ...fieldPlayers.asMap().entries.map((entry) {
                       final index = entry.key;
                       final player = entry.value;
@@ -231,6 +264,28 @@ class _TacticsBoardState extends State<TacticsBoard> {
                         ),
                       );
                     }),
+                    
+                    // Display position coordinates tooltip
+                    if (_mousePosition != null && _transformedPosition != null)
+                      Positioned(
+                        left: _mousePosition!.dx + 10,
+                        top: _mousePosition!.dy - 30,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            'X: ${_transformedPosition![0].toStringAsFixed(1)}, Y: ${_transformedPosition![1].toStringAsFixed(1)}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 );
               },
@@ -298,6 +353,8 @@ class _TacticsBoardState extends State<TacticsBoard> {
   }
 }
 
+// ...existing code...
+
 // Player Model
 class PlayerFormation {
   final Color color;
@@ -344,8 +401,8 @@ class PlayerCircle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.sizeOf(context).width * 0.05,
-      height: MediaQuery.sizeOf(context).height * 0.05,
+      width: MediaQuery.sizeOf(context).width * 0.03,
+      height: MediaQuery.sizeOf(context).height * 0.03,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: (number == 1)
