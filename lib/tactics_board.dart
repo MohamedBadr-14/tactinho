@@ -10,38 +10,79 @@ class TacticsBoard extends StatefulWidget {
 }
 
 class _TacticsBoardState extends State<TacticsBoard> {
-  List<PlayerFormation> fieldPlayers = [];
-  var has_Ball = false;
-  var goalkeeper_selected = false;
+List<PlayerFormation> fieldPlayers = [];
+var has_Ball = false;
+var goalkeeper_selected = true; // Always true since we auto-add goalkeeper
+int yellowPlayerCount = 0; // Track number of yellow players (max 2)
+int redPlayerCount = 0;    // Track number of red players (max 3)
   // Add variables to track mouse position
-  Offset? _mousePosition;
-  List<double>? _transformedPosition;
+Offset? _mousePosition;
+List<double>? _transformedPosition;
 
-  void _undoLastPlayer() {
+@override
+void initState() {
+super.initState();
+_addGoalkeeper();
+}
+
+@override
+_undoLastPlayer() {
     if (fieldPlayers.isNotEmpty) {
-      final lastPlayer = fieldPlayers.last;
-      if (lastPlayer.ballpossession) {
-        has_Ball = false; // Reset ball possession if last player had it
-      }
-      if (lastPlayer.number == 3) {
-        goalkeeper_selected =
-            false; // Reset goalkeeper selection if last player was the goalkeeper
-      }
-      setState(() {
-        fieldPlayers.removeLast();
-      });
+    final lastPlayer = fieldPlayers.last;
+    
+    // Don't remove the goalkeeper (player #3)
+    if (lastPlayer.number == 3) {
+        return;
     }
-  }
-
-  void _clearPlayers() {
-    has_Ball = false;
-    goalkeeper_selected = false; // Reset goalkeeper selection
+    
+    if (lastPlayer.ballpossession) {
+        has_Ball = false; // Reset ball possession if last player had it
+    }
+    
+    // Update player counts
+    if (lastPlayer.number == 1) {
+        yellowPlayerCount--;
+    } else if (lastPlayer.number == 2) {
+        redPlayerCount--;
+    }
+    
     setState(() {
-      fieldPlayers.clear();
+        fieldPlayers.removeLast();
     });
-  }
+    }
+}
 
-  @override
+void _clearPlayers() {
+    has_Ball = false;
+    // Reset player counts
+    yellowPlayerCount = 0;
+    redPlayerCount = 0;
+    setState(() {
+    // Remove all players except the goalkeeper
+    fieldPlayers.removeWhere((player) => player.number != 3);
+    
+    // If goalkeeper was somehow removed, add it back
+    if (fieldPlayers.isEmpty) {
+        _addGoalkeeper();
+    }
+    });
+}
+
+void _addGoalkeeper() {
+// Add goalkeeper at a fixed position near the top goal
+setState(() {
+    // Position is set at top-center of field (0.485, 0.02)
+    fieldPlayers.add(
+    PlayerFormation(
+        color: const Color.fromARGB(255, 27, 3, 249), // Blue color for goalkeeper
+        number: 3, // Goalkeeper number
+        position: const Offset(0.485, 0.02), // Fixed position near top goal
+    ),
+    );
+});
+}
+
+@override
   Widget build(BuildContext context) {
     return Container(
       color: Colors.green,
@@ -80,39 +121,42 @@ class _TacticsBoardState extends State<TacticsBoard> {
                       return Wrap(
                         alignment: WrapAlignment.center,
                         spacing: 4,
-                        children: List.generate(3, (index) {
-                          final player = PlayerFormation(
-                            color: Colors.primaries[index],
+                        children: List.generate(2, (index) {
+                        final player = PlayerFormation(
+                            color: index == 0 
+                                ? const Color.fromARGB(255, 255, 255, 0) // Yellow
+                                : const Color.fromARGB(255, 255, 55, 0), // Red
                             number: index + 1,
-                          );
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 2),
-                            child: player.number == 3 && goalkeeper_selected
+                        );
+                        return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2),
+                        child: (player.number == 1 && yellowPlayerCount >= 2) || 
+                            (player.number == 2 && redPlayerCount >= 3)
                                 ? Opacity(
                                     opacity: 0.4,
                                     child: PlayerCircle(
-                                      color: player.color,
-                                      number: player.number,
+                                    color: player.color,
+                                    number: player.number,
                                     ),
-                                  )
+                                )
                                 : Draggable<PlayerFormation>(
                                     data: player,
                                     feedback: PlayerCircle(
-                                      color: player.color,
-                                      number: player.number,
+                                    color: player.color,
+                                    number: player.number,
                                     ),
                                     childWhenDragging: Opacity(
-                                      opacity: 0.4,
-                                      child: PlayerCircle(
+                                    opacity: 0.4,
+                                    child: PlayerCircle(
                                         color: player.color,
                                         number: player.number,
-                                      ),
+                                    ),
                                     ),
                                     child: PlayerCircle(
-                                      color: player.color,
-                                      number: player.number,
+                                    color: player.color,
+                                    number: player.number,
                                     ),
-                                  ),
+                                ),
                           );
                         }),
                       );
@@ -194,10 +238,11 @@ class _TacticsBoardState extends State<TacticsBoard> {
                             dx * 90
                           ];
                           setState(() {
-                            // print(fieldPlayers);
-                            if (details.data.number == 3 &&
-                                !goalkeeper_selected) {
-                              goalkeeper_selected = true;
+                            // Update player counts based on type
+                            if (details.data.number == 1) {
+                                yellowPlayerCount++;
+                            } else if (details.data.number == 2) {
+                                redPlayerCount++;
                             }
                             fieldPlayers.add(
                               details.data.copyWith(
