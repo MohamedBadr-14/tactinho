@@ -92,7 +92,7 @@ setState(() {
           Container(
             color: const Color.fromARGB(255, 216, 206, 206),
             padding: const EdgeInsets.symmetric(vertical: 8),
-            height: 60,
+            height: 90,
             child: Row(
               children: [
                 // Undo Button
@@ -186,6 +186,13 @@ setState(() {
             ),
           ),
 
+          Container(
+
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height * 0.2, // 2% of screen height
+            child: SizedBox(),
+          ),
+
           // Football Field
           Expanded(
             flex: 6,
@@ -226,16 +233,23 @@ setState(() {
                               Offset(
                                 0,
                                 AppBar().preferredSize.height +
-                                    MediaQuery.of(context).padding.top,
+                                    MediaQuery.of(context).padding.top+ MediaQuery.of(context).size.height * 0.2, // Reserve space for top controls
                               );
-                          final dx =
+                          var dx =
+
                               (localOffset.dx / fieldSize.width).clamp(0.0, 1.0);
                           final dy =
                               (localOffset.dy / fieldSize.height).clamp(0.0, 1.0);
 
+                          // var tmp_dx = (localOffset.dx / fieldSize.width);
+                          // print ("tmp_dx: $tmp_dx");
+
+                          var dxx = ((dx*90 *(2/3)) + 15.0);
+                          print("dxx: $dxx");
+                              
                           final positionTransformed = [
                             60 - (dy * 60),
-                            dx * 90
+                            dxx 
                           ];
                           setState(() {
                             // Update player counts based on type
