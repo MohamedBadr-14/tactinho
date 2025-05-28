@@ -28,7 +28,7 @@ Future<List<List<Map<String, dynamic>>>> sendPlayerData(var jsonSend) async {
 
         // Process each scene in the sequence
 
-        print('Received sequence: $sequence');
+        // print('Received sequence: $sequence');
 
         for (int i = 0; i < sequence.length; i++) {
           Map<String, dynamic> scene = sequence[i];
@@ -94,13 +94,13 @@ Future<List<List<Map<String, dynamic>>>> sendPlayerData(var jsonSend) async {
           // Add scene to all scenes
           allScenes.add(scenePlayersList);
         }
-        print('Processed ${allScenes.length} scenes.');
-        print('First scene players: ${allScenes[0]}');
-        print('Last scene players: ${allScenes.last}');
+        // print('Processed ${allScenes.length} scenes.');
+        // print('First scene players: ${allScenes[0]}');
+        // print('Last scene players: ${allScenes.last}');
       }
 
       // Print the result for debugging
-      print('Transformed data: ${jsonEncode(allScenes)}');
+      // print('Transformed data: ${jsonEncode(allScenes)}');
       return allScenes;
 
       // Success!

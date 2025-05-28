@@ -94,7 +94,7 @@ class SceneMatcher:
                 height = np.max(positions[:, 1]) - np.min(positions[:, 1])
                 features[f"{prefix}width"] = width
                 features[f"{prefix}height"] = height
-                print("midoo", features)
+                # print("midoo", features)
 
                 # Spread metrics
                 dist_to_centroid = np.linalg.norm(positions - centroid, axis=1)
@@ -112,7 +112,7 @@ class SceneMatcher:
 
         return features
     
-    def filter_scenes(self, query_feats, max_abs_dist=600):
+    def filter_scenes(self, query_feats, max_abs_dist=5):
         """Filter scenes in 2 stages:
         1. Exact team size match.
         2. Absolute position proximity (ball + centroids).
@@ -121,7 +121,7 @@ class SceneMatcher:
 
         # Stage 1: Team size matching
         for idx, scene_feats in self.features.items():
-            print('hasball,scene_feats["team1_has_ball"]', scene_feats["team1_has_ball"])
+            # print('hasball,scene_feats["team1_has_ball"]', scene_feats["team1_has_ball"])
             if (
                 scene_feats["team1_size"] == query_feats["team1_size"]
                 and scene_feats["team2_size"] == query_feats["team2_size"]
@@ -140,7 +140,7 @@ class SceneMatcher:
             scene_feats = self.features[idx]
             scene_ball = np.array([scene_feats["ball_x"], scene_feats["ball_y"]])
             ball_dist = np.linalg.norm(query_ball - scene_ball)
-            print("Ball dist:", ball_dist)
+            # print("Ball dist:", ball_dist)
 
             if ball_dist <= max_abs_dist:
                 # and (
@@ -160,8 +160,8 @@ class SceneMatcher:
 
         # Build query vector
         query_vector = [query_feats.get(f, 0) for f in formation_features]
-        print(query_feats)
-        print("Query vector:", query_vector)
+        # print(query_feats)
+        # print("Query vector:", query_vector)
 
         # Build candidate matrix
         candidate_vectors = []
@@ -221,7 +221,7 @@ class SceneMatcher:
                 )
                 scene_id += 1
                 
-        print("Processed scenes:", all_scenes)
+        # print("Processed scenes:", all_scenes)
         return all_scenes, features_obj
     
     def get_sequence_from_match(self, initial_scene_id):
@@ -237,19 +237,34 @@ class SceneMatcher:
         return sequence
 
 # Initialize with your training data
-scenes_arr=load_sequences_from_json("transformed_tracks.json")
+# scenes=load_sequences_from_json("db.json")
+scenes = [load_sequences_from_json("transformed_tracks.json")]
 # print("Loaded scenes:", scenes_arr)
 
-matcher = SceneMatcher([scenes_arr])  # Pass your actual training sequences
+matcher = SceneMatcher(scenes)  # Pass your actual training sequences
 
 @app.route('/api/get_all_first_scenes', methods=['GET'])
 def get_all_first_scenes():
     """
-    Endpoint to retrieve all first scenes (those without a previous scene)
+    Endpoint to retrieve only the first scene from each sequence
     """
     try:
-        first_scenes = [scene for scene in matcher.scenes if scene['id'] == 0]
-        return jsonify({"first_scenes": first_scenes}), 200
+        # Find the start ID of each sequence
+        first_scene_ids = set()
+        current_id = 0
+        
+        # Iterate through the original sequences structure to find first IDs
+        sequence_count = 0
+        for sequence in scenes:
+            if sequence:  # Check if sequence is not empty
+                first_scene_ids.add(current_id)
+                current_id += len(sequence)  # Skip to next sequence
+                sequence_count += 1
+        
+        # Get only the first scenes
+        first_scenes = [scene for scene in matcher.scenes if scene['id'] in first_scene_ids]
+        
+        return jsonify({"first_scenes": first_scenes, "count": len(first_scenes)}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -272,7 +287,7 @@ def predict_sequence():
     """
     try:
         data = request.get_json()
-        print("Received data:", data['scene'])
+        # print("Received data:", data['scene'])
         input_scene = data.get('scene')
         
         if not input_scene:

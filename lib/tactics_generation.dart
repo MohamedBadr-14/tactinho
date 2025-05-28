@@ -242,7 +242,10 @@ class _TacticsRunState extends State<TacticsRun> {
         // currentFormationIndex = (currentFormationIndex + i) % formations.length;
         // draw actions[i];
         if (actions.isNotEmpty) {
-          _currentDescription = actionList[actions[i]] ?? "Unknown Action";
+          // i want the _currentDescription to be the action description + scene id
+          _currentDescription = "Scene ${i}: " +
+              (actionList[actions[i]] ?? "Unknown Action");
+          // _currentDescription = actionList[actions[i]] ?? "Unknown Action";
         } else {
           _currentDescription = _descriptions[i];
         }
