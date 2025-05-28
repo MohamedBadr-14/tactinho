@@ -237,8 +237,8 @@ class SceneMatcher:
         return sequence
 
 # Initialize with your training data
-# scenes=load_sequences_from_json("db.json")
-scenes = [load_sequences_from_json("transformed_tracks.json")]
+scenes=load_sequences_from_json("db.json")
+# scenes = [load_sequences_from_json("transformed_tracks.json")]
 # print("Loaded scenes:", scenes_arr)
 
 matcher = SceneMatcher(scenes)  # Pass your actual training sequences
