@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 Future<List<List<Map<String, dynamic>>>> sendPlayerData(var jsonSend) async {
   // On Android emulator, use 10.0.2.2 to reach your host machine’s localhost.
   // On iOS simulator or a real device, replace with your machine’s LAN IP or use ngrok.
-  final uri = Uri.parse('http://192.168.100.150:5000/api/predict_sequence');
+  final uri = Uri.parse('http://127.0.0.1:5000/api/predict_sequence');
 
   List<List<Map<String, dynamic>>> allScenes = [];
   // print('Sending data to server: ${jsonEncode(jsonSend)}');
