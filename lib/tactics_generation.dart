@@ -176,24 +176,24 @@ class _TacticsRunState extends State<TacticsRun> {
     // "Player 2 shoots -> Goal!"
   ];
 
-  final Map<int, String> actionList = {
-    0: "Pass Forward", // Basa Foo2
-    1: "Pass Forward-Right", // Basa Foo2 ymeen
-    2: "Pass Right", // Basa Ymeen
-    3: "Pass Backward-Right", // Basa Taht ymeen
-    4: "Pass Backward", // Basa Taht
-    5: "Pass Backward-Left", // Basa Taht shmal
-    6: "Pass Left", // Basa Shmal
-    7: "Pass Forward-Left", // Basa Foo2 shmal
-    8: "Dribble Forward", // dribble Foo2
-    9: "Dribble Forward-Right", // dribble Foo2 ymeen
-    10: "Dribble Right", // dribble Ymeen
-    11: "Dribble Backward-Right", // dribble Taht ymeen
-    12: "Dribble Backward", // dribble Taht
-    13: "Dribble Backward-Left", // dribble Taht shmal
-    14: "Dribble Left", // dribble Shmal
-    15: "Dribble Forward-Left", // dribble Foo2 shmal
-    16: "Shoot", // shoot
+    final Map<int, String> actionList = {
+    0: "Pass Left",              // Was Forward, now Left
+    1: "Pass Forward-Left",      // Was Forward-Right, now Forward-Left
+    2: "Pass Forward",           // Was Right, now Forward
+    3: "Pass Forward-Right",     // Was Backward-Right, now Forward-Right
+    4: "Pass Right",             // Was Backward, now Right
+    5: "Pass Backward-Right",    // Was Backward-Left, now Backward-Right
+    6: "Pass Backward",          // Was Left, now Backward
+    7: "Pass Backward-Left",     // Was Forward-Left, now Backward-Left
+    8: "Dribble Left",           // Was Dribble Forward, now Dribble Left
+    9: "Dribble Forward-Left",   // Was Dribble Forward-Right, now Dribble Forward-Left
+    10: "Dribble Forward",       // Was Dribble Right, now Dribble Forward
+    11: "Dribble Forward-Right", // Was Dribble Backward-Right, now Dribble Forward-Right
+    12: "Dribble Right",         // Was Dribble Backward, now Dribble Right
+    13: "Dribble Backward-Right",// Was Dribble Backward-Left, now Dribble Backward-Right
+    14: "Dribble Backward",      // Was Dribble Left, now Dribble Backward
+    15: "Dribble Backward-Left", // Was Dribble Forward-Left, now Dribble Backward-Left
+    16: "Shoot",                 // Shoot remains the same
   };
 
   Future<void> _captureFieldImage() async {
