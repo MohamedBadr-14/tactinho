@@ -8,6 +8,7 @@ import 'package:tactinho/report.dart';
 import 'package:tactinho/tactics_board.dart';
 import 'package:tactinho/backend.dart';
 import 'package:flutter/rendering.dart';
+import 'package:tactinho/goal.dart';
 import 'dart:io';
 import 'dart:ui';
 import 'dart:typed_data';
@@ -243,8 +244,8 @@ class _TacticsRunState extends State<TacticsRun> {
         // draw actions[i];
         if (actions.isNotEmpty) {
           // i want the _currentDescription to be the action description + scene id
-          _currentDescription = "Scene ${i}: " +
-              (actionList[actions[i]] ?? "Unknown Action");
+          _currentDescription =
+              "Scene ${i}: " + (actionList[actions[i]] ?? "Unknown Action");
           // _currentDescription = actionList[actions[i]] ?? "Unknown Action";
         } else {
           _currentDescription = _descriptions[i];
@@ -336,18 +337,20 @@ class _TacticsRunState extends State<TacticsRun> {
           children: [
             Expanded(
                 flex: 1,
-                child: Container(
-                  padding: const EdgeInsets.all(16.0),
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Tactics Generation",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                )),
+                child: Container(child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final fieldSize = constraints.biggest;
+                    return Stack(
+                      children: [
+                        // Draw Goal
+                        CustomPaint(
+                          size: fieldSize,
+                          painter: Goal(),
+                        ),
+                      ],
+                    );
+                  },
+                ))),
             Expanded(
               flex: 6,
               child: LayoutBuilder(
@@ -489,40 +492,7 @@ class _TacticsRunState extends State<TacticsRun> {
                 },
               ),
             ),
-            // Expanded(
-            //   flex: 1,
-            //   child: (_currentDescription != "")
-            //       ?(_currentDescription =="finish")?
-            //   ElevatedButton(
-            //           onPressed: () {
-            //             Navigator.pushReplacement(
-            //               context,
-            //               MaterialPageRoute(
-            //                 builder: (context) => TacticsReportPage(
-            //                   tactics: tactics,),
-            //               ),
-            //             );
-            //           },
-            //           child: Text("View report"),
-            //         ):
-
-            //        Center(
-            //           child: Container(
-            //             padding:
-            //                 EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            //             decoration: BoxDecoration(
-            //               color: Colors.black.withOpacity(0.7),
-            //               borderRadius: BorderRadius.circular(12),
-            //             ),
-            //             child: Text(
-            //               _currentDescription,
-            //               style: TextStyle(color: Colors.white, fontSize: 16),
-            //               textAlign: TextAlign.center,
-            //             ),
-            //           ),
-            //         )
-            //       : SizedBox(),
-            // )
+          
           ],
         ),
       ),
@@ -587,9 +557,9 @@ class PlayerDot extends StatelessWidget {
       decoration: BoxDecoration(
         color: (team == 1)
             ? Colors.yellow
-            : (team == 2)
-                ? Color.fromARGB(255, 255, 64, 0)
-                : Color.fromARGB(255, 0, 64, 255),
+            : (team == 3)
+                ? Color.fromARGB(255, 0, 64, 255)
+                : Color.fromARGB(255, 255, 64, 0),
         shape: BoxShape.circle,
         border:
             Border.all(color: highlight ? Colors.red : Colors.white, width: 3),

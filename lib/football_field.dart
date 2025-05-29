@@ -126,15 +126,7 @@ class HalfFootballFieldPainter extends CustomPainter {
       linePaint,
     );
 
-    // Draw goal
-    final goalWidth = 7.3 * scaleX; // 7.3m (standard goal width)
-    final goalHeight = 2.0 * scaleY; // 2m depth for visual representation
-    final goalLeft = (fieldWidth - goalWidth) / 2;
-
-    canvas.drawRect(
-      Rect.fromLTWH(goalLeft, -goalHeight, goalWidth, goalHeight),
-      linePaint,
-    );
+   
   }
 
   @override

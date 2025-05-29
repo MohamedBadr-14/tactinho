@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tactinho/football_field.dart';
 import 'package:tactinho/tactics_generation.dart';
+import 'package:tactinho/goal.dart';
 
 class TacticsBoard extends StatefulWidget {
   const TacticsBoard({super.key});
@@ -10,82 +11,83 @@ class TacticsBoard extends StatefulWidget {
 }
 
 class _TacticsBoardState extends State<TacticsBoard> {
-List<PlayerFormation> fieldPlayers = [];
-var has_Ball = false;
-var goalkeeper_selected = true; // Always true since we auto-add goalkeeper
-int yellowPlayerCount = 0; // Track number of yellow players (max 2)
-int redPlayerCount = 0;    // Track number of red players (max 3)
+  List<PlayerFormation> fieldPlayers = [];
+  var has_Ball = false;
+  var goalkeeper_selected = true; // Always true since we auto-add goalkeeper
+  int yellowPlayerCount = 0; // Track number of yellow players (max 2)
+  int redPlayerCount = 0; // Track number of red players (max 3)
   // Add variables to track mouse position
-Offset? _mousePosition;
-List<double>? _transformedPosition;
+  Offset? _mousePosition;
+  List<double>? _transformedPosition;
 
-@override
-void initState() {
-super.initState();
-_addGoalkeeper();
-}
+  @override
+  void initState() {
+    super.initState();
+    _addGoalkeeper();
+  }
 
-@override
-_undoLastPlayer() {
+  @override
+  _undoLastPlayer() {
     if (fieldPlayers.isNotEmpty) {
-    final lastPlayer = fieldPlayers.last;
-    
-    // Don't remove the goalkeeper (player #3)
-    if (lastPlayer.number == 3) {
-        return;
-    }
-    
-    if (lastPlayer.ballpossession) {
-        has_Ball = false; // Reset ball possession if last player had it
-    }
-    
-    // Update player counts
-    if (lastPlayer.number == 1) {
-        yellowPlayerCount--;
-    } else if (lastPlayer.number == 2) {
-        redPlayerCount--;
-    }
-    
-    setState(() {
-        fieldPlayers.removeLast();
-    });
-    }
-}
+      final lastPlayer = fieldPlayers.last;
 
-void _clearPlayers() {
+      // Don't remove the goalkeeper (player #3)
+      if (lastPlayer.number == 3) {
+        return;
+      }
+
+      if (lastPlayer.ballpossession) {
+        has_Ball = false; // Reset ball possession if last player had it
+      }
+
+      // Update player counts
+      if (lastPlayer.number == 1) {
+        yellowPlayerCount--;
+      } else if (lastPlayer.number == 2) {
+        redPlayerCount--;
+      }
+
+      setState(() {
+        fieldPlayers.removeLast();
+      });
+    }
+  }
+
+  void _clearPlayers() {
     has_Ball = false;
     // Reset player counts
     yellowPlayerCount = 0;
     redPlayerCount = 0;
     setState(() {
-    // Remove all players except the goalkeeper
-    fieldPlayers.removeWhere((player) => player.number != 3);
-    
-    // If goalkeeper was somehow removed, add it back
-    if (fieldPlayers.isEmpty) {
+      // Remove all players except the goalkeeper
+      fieldPlayers.removeWhere((player) => player.number != 3);
+
+      // If goalkeeper was somehow removed, add it back
+      if (fieldPlayers.isEmpty) {
         _addGoalkeeper();
-    }
+      }
     });
-}
+  }
 
-void _addGoalkeeper() {
+  void _addGoalkeeper() {
 // Add goalkeeper at a fixed position near the top goal
-setState(() {
-    // Position is set at top-center of field (0.485, 0.02)
-    fieldPlayers.add(
-    PlayerFormation(
-        color: const Color.fromARGB(255, 27, 3, 249), // Blue color for goalkeeper
-        number: 3, // Goalkeeper number
-        position: const Offset(0.485, 0.02), // Fixed position near top goal
-    ),
-    );
-});
-}
+    setState(() {
+      // Position is set at top-center of field (0.485, 0.02)
+      fieldPlayers.add(
+        PlayerFormation(
+          color: const Color.fromARGB(
+              255, 27, 3, 249), // Blue color for goalkeeper
+          number: 3, // Goalkeeper number
+          position: const Offset(0.485, 0.02), // Fixed position near top goal
+        ),
+      );
+    });
+  }
 
-@override
+  @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.green,
+      color: Color(0xFF1E6C41),
       child: Column(
         children: [
           // Top Controls
@@ -122,41 +124,43 @@ setState(() {
                         alignment: WrapAlignment.center,
                         spacing: 4,
                         children: List.generate(2, (index) {
-                        final player = PlayerFormation(
-                            color: index == 0 
-                                ? const Color.fromARGB(255, 255, 255, 0) // Yellow
+                          final player = PlayerFormation(
+                            color: index == 0
+                                ? const Color.fromARGB(
+                                    255, 255, 255, 0) // Yellow
                                 : const Color.fromARGB(255, 255, 55, 0), // Red
                             number: index + 1,
-                        );
-                        return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2),
-                        child: (player.number == 1 && yellowPlayerCount >= 2) || 
-                            (player.number == 2 && redPlayerCount >= 3)
+                          );
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 2),
+                            child: (player.number == 1 &&
+                                        yellowPlayerCount >= 2) ||
+                                    (player.number == 2 && redPlayerCount >= 3)
                                 ? Opacity(
                                     opacity: 0.4,
                                     child: PlayerCircle(
-                                    color: player.color,
-                                    number: player.number,
+                                      color: player.color,
+                                      number: player.number,
                                     ),
-                                )
+                                  )
                                 : Draggable<PlayerFormation>(
                                     data: player,
                                     feedback: PlayerCircle(
-                                    color: player.color,
-                                    number: player.number,
+                                      color: player.color,
+                                      number: player.number,
                                     ),
                                     childWhenDragging: Opacity(
-                                    opacity: 0.4,
-                                    child: PlayerCircle(
+                                      opacity: 0.4,
+                                      child: PlayerCircle(
                                         color: player.color,
                                         number: player.number,
-                                    ),
+                                      ),
                                     ),
                                     child: PlayerCircle(
-                                    color: player.color,
-                                    number: player.number,
+                                      color: player.color,
+                                      number: player.number,
                                     ),
-                                ),
+                                  ),
                           );
                         }),
                       );
@@ -187,11 +191,23 @@ setState(() {
           ),
 
           Container(
-
-            width: double.infinity,
-            height: MediaQuery.of(context).size.height * 0.2, // 2% of screen height
-            child: SizedBox(),
-          ),
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height *
+                  0.2, // 2% of screen height
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final fieldSize = constraints.biggest;
+                  return Stack(
+                    children: [
+                      // Draw Goal
+                      CustomPaint(
+                        size: fieldSize,
+                        painter: Goal(),
+                      ),
+                    ],
+                  );
+                },
+              )),
 
           // Football Field
           Expanded(
@@ -205,16 +221,18 @@ setState(() {
                     MouseRegion(
                       onHover: (event) {
                         final localOffset = event.localPosition;
-                        final dx = (localOffset.dx / fieldSize.width).clamp(0.0, 1.0);
-                        final dy = (localOffset.dy / fieldSize.height).clamp(0.0, 1.0);
-                        
+                        final dx =
+                            (localOffset.dx / fieldSize.width).clamp(0.0, 1.0);
+                        final dy =
+                            (localOffset.dy / fieldSize.height).clamp(0.0, 1.0);
+
                         // Update without forcing a full rebuild
                         if (mounted) {
                           setState(() {
                             _mousePosition = localOffset;
                             _transformedPosition = [
-                              60 - (dy * 60),  // y-coordinate (0-60)
-                              dx * 90,         // x-coordinate (0-90)
+                              60 - (dy * 60), // y-coordinate (0-60)
+                              dx * 90, // x-coordinate (0-90)
                             ];
                           });
                         }
@@ -233,30 +251,28 @@ setState(() {
                               Offset(
                                 0,
                                 AppBar().preferredSize.height +
-                                    MediaQuery.of(context).padding.top+ MediaQuery.of(context).size.height * 0.2, // Reserve space for top controls
+                                    MediaQuery.of(context).padding.top +
+                                    MediaQuery.of(context).size.height *
+                                        0.2, // Reserve space for top controls
                               );
-                          var dx =
-
-                              (localOffset.dx / fieldSize.width).clamp(0.0, 1.0);
-                          final dy =
-                              (localOffset.dy / fieldSize.height).clamp(0.0, 1.0);
+                          var dx = (localOffset.dx / fieldSize.width)
+                              .clamp(0.0, 1.0);
+                          final dy = (localOffset.dy / fieldSize.height)
+                              .clamp(0.0, 1.0);
 
                           // var tmp_dx = (localOffset.dx / fieldSize.width);
                           // print ("tmp_dx: $tmp_dx");
 
-                          var dxx = ((dx*90 *(2/3)) + 15.0);
+                          var dxx = ((dx * 90 * (2 / 3)) + 15.0);
                           print("dxx: $dxx");
-                              
-                          final positionTransformed = [
-                            60 - (dy * 60),
-                            dxx 
-                          ];
+
+                          final positionTransformed = [60 - (dy * 60), dxx];
                           setState(() {
                             // Update player counts based on type
                             if (details.data.number == 1) {
-                                yellowPlayerCount++;
+                              yellowPlayerCount++;
                             } else if (details.data.number == 2) {
-                                redPlayerCount++;
+                              redPlayerCount++;
                             }
                             fieldPlayers.add(
                               details.data.copyWith(
@@ -264,7 +280,8 @@ setState(() {
                               ),
                             );
                           });
-                          print('Player added: ${details.data.number} at position: $positionTransformed');
+                          print(
+                              'Player added: ${details.data.number} at position: $positionTransformed');
                         },
                         builder: (context, candidateData, rejectedData) {
                           return CustomPaint(
@@ -323,14 +340,15 @@ setState(() {
                         ),
                       );
                     }),
-                    
+
                     // Display position coordinates tooltip
                     if (_mousePosition != null && _transformedPosition != null)
                       Positioned(
                         left: _mousePosition!.dx + 10,
                         top: _mousePosition!.dy - 30,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: Colors.black.withOpacity(0.7),
                             borderRadius: BorderRadius.circular(4),
@@ -361,7 +379,8 @@ setState(() {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1E6C41),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
                 onPressed: () {
                   if (!has_Ball) {

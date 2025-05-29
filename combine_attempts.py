@@ -25,7 +25,7 @@ def combine_json_files():
             print(f"Error processing {json_file}: {str(e)}")
     
     # Save the combined data to a new file
-    output_file = "db.json"
+    output_file = "dba.json"
     with open(output_file, 'w') as f:
         json.dump(combined_data, f, indent=2)
     

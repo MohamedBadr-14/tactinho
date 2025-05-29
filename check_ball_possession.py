@@ -81,5 +81,5 @@ def check_ball_possession(json_file):
 
 if __name__ == "__main__":
     # Use command line argument if provided, otherwise default to "db.json"
-    json_file = sys.argv[1] if len(sys.argv) > 1 else "db.json"
+    json_file = sys.argv[1] if len(sys.argv) > 1 else "dba.json"
     check_ball_possession(json_file)

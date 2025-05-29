@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'dart:math';
 import 'package:http/http.dart' as http;
 
 Future<List<List<Map<String, dynamic>>>> sendPlayerData(var jsonSend) async {
@@ -19,7 +19,24 @@ Future<List<List<Map<String, dynamic>>>> sendPlayerData(var jsonSend) async {
       body: jsonEncode({'scene': jsonSend}),
     );
     // print(jsonSend);
+                  Map<String, dynamic> Shoot_object_2 = {
+                "color": 4278190080, 
+                "number":99,
+                "position": {"dx": 0.53, "dy":  -0.01},
+                "ballpossession": false,
+                "team": 3
+              };
 
+                      Map<String, dynamic> Shoot_object_1 = {
+                "color": 4278190080, 
+                "number":500,
+                "position": {"dx": 0.44, "dy":  -0.01},
+                "ballpossession": false,
+                "team": 3
+              };
+  
+
+    List<Map<String, dynamic>> lastscene = [];
     if (response.statusCode == 200 || response.statusCode == 201) {
       final responseData = jsonDecode(response.body);
 
@@ -31,8 +48,8 @@ Future<List<List<Map<String, dynamic>>>> sendPlayerData(var jsonSend) async {
         // print('Received sequence: $sequence');
 
         for (int i = 0; i < sequence.length; i++) {
-          Map<String, dynamic> scene = sequence[i];
           List<Map<String, dynamic>> scenePlayersList = [];
+          Map<String, dynamic> scene = sequence[i];
 
           // Process players in the scene
           if (scene.containsKey('players')) {
@@ -49,7 +66,7 @@ Future<List<List<Map<String, dynamic>>>> sendPlayerData(var jsonSend) async {
 
               // Convert team to color (example mapping)
               int color = playerData['team'] == 0
-                  ? 4278255360
+                  ? 4294901760
                   : 4294901760; // Green for team 0, Red for team 1
 
               // Create player object in desired format
@@ -67,25 +84,25 @@ Future<List<List<Map<String, dynamic>>>> sendPlayerData(var jsonSend) async {
           }
 
           // Add goalkeeper if exists
-          if (scene.containsKey('goalkeeper')) {
-            scene['goalkeeper'].forEach((keeperId, keeperData) {
-              List<dynamic> positionTransformed =
-                  keeperData['position_transformed'];
-              double dy =
-                  (60 - positionTransformed[0]) / 60; // Normalize to 0-1 range
-              double dx = positionTransformed[1] / 90;
+        
+       
+    
               Map<String, dynamic> keeperObject = {
-                "color": 4278190080, // Black color for goalkeeper
-                "number": int.parse(keeperId) +
-                    1, // Using 3 for goalkeeper as in your example
-                "position": {"dx": dx, "dy": dy},
+                "color": 4278190080, 
+                "number":97,
+                "position": {"dx": 0.485, "dy":  0.02},
                 "ballpossession": false,
                 "team": 3
               };
 
+
               scenePlayersList.add(keeperObject);
-            });
-          }
+
+// Create a copy of scenePlayersList instead of just a reference
+lastscene = List<Map<String, dynamic>>.from(scenePlayersList);              scenePlayersList.add(Shoot_object_1);
+
+              scenePlayersList.add(Shoot_object_2);
+        
           // action: 2 example of action
           if (scene.containsKey('action')){
             scenePlayersList.add({
@@ -94,13 +111,44 @@ Future<List<List<Map<String, dynamic>>>> sendPlayerData(var jsonSend) async {
           // Add scene to all scenes
           allScenes.add(scenePlayersList);
         }
-        // print('Processed ${allScenes.length} scenes.');
-        // print('First scene players: ${allScenes[0]}');
-        // print('Last scene players: ${allScenes.last}');
+     
       }
+      
+      List<Map<String, dynamic>> Shootsceen = [];
+      print("daksdkas $lastscene");
+      for (var player in lastscene) {
+        Map<String, dynamic> playerCopy = Map<String, dynamic>.from(player);
+        playerCopy['ballpossession'] = false;
+      
+        Shootsceen.add(playerCopy);
+      }
+      print("Shootsceen: $Shootsceen");
 
-      // Print the result for debugging
-      // print('Transformed data: ${jsonEncode(allScenes)}');
+    // Generate random number (1 or 2)
+        final random = Random();
+        final randomNumber = random.nextInt(2) + 1; // Random number between 1 and 2
+
+        print('Random number generated: $randomNumber');
+        
+      if (randomNumber == 1) {
+        // Add Shoot_object_1 to Shootsceen
+              Shoot_object_1['ballpossession'] = true;
+
+      } else {
+        // Add Shoot_object_2 to Shootsceen
+              Shoot_object_2['ballpossession'] = true;
+      }
+      Shootsceen.add(Shoot_object_1);
+      Shootsceen.add(Shoot_object_2);
+      Shootsceen.add({
+              "action": 16});
+          
+      allScenes.add(Shootsceen);
+
+
+      print(allScenes);
+      
+    
       return allScenes;
 
       // Success!
