@@ -94,7 +94,7 @@ class _TacticsBoardState extends State<TacticsBoard> {
           Container(
             color: const Color.fromARGB(255, 216, 206, 206),
             padding: const EdgeInsets.symmetric(vertical: 8),
-            height: 90,
+            height: 60,
             child: Row(
               children: [
                 // Undo Button
