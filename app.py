@@ -115,36 +115,36 @@ class SceneMatcher:
         Applies a proximity threshold to consider only close matches.
         """
         if len(query_positions) == 0 or len(candidate_positions) == 0:
-            return float('inf')
-        
+            return 0
+    
         if len(query_positions) != len(candidate_positions):
             return float('inf')
-        
+    
         # Calculate distance matrix between all query and candidate players
         distance_matrix = cdist(query_positions, candidate_positions, metric='euclidean')
-        
+    
         # Apply a proximity threshold - set very large distances for players far apart
         proximity_threshold = 10.0  # Adjust based on your data
         penalty_matrix = distance_matrix.copy()
         penalty_matrix[distance_matrix > proximity_threshold] = 1000.0  # Large penalty
-        
+    
         # Use Hungarian algorithm to find optimal assignment with the penalty matrix
         row_indices, col_indices = linear_sum_assignment(penalty_matrix)
-        
+    
         # Calculate total distance using the original distances
         matched_distances = distance_matrix[row_indices, col_indices]
-        
+    
         # Count how many matches exceed the threshold
         exceeding_threshold = matched_distances > proximity_threshold
         num_bad_matches = np.sum(exceeding_threshold)
-        
+    
         # Use original distances but apply penalties for bad matches
         total_distance = np.sum(matched_distances)
-        
+    
         # If too many bad matches, consider this a poor formation match
         if num_bad_matches > len(matched_distances) / 3:  # More than 1/3 are bad matches
             total_distance = float('inf')
-        
+    
         return total_distance
     
     def match_formations(self, query_feats, candidate_indices):
