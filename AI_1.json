@@ -1,162 +1,151 @@
 [
-  {
-    "players": {
-      "0": {
-        "team": 1,
-        "position_transformed": [29.0, 48.0]
+  [
+    {
+      "players": {
+        "0": {
+          "team": 1,
+          "position_transformed": [58.8, 44.099999999999994],
+          "has_ball": false,
+          "bbox": [485, 14, 535, 94],
+          "position": [510, 94]
+        },
+        "1": {
+          "team": 1,
+          "position_transformed": [22.435556052808202, 27.286833855799387],
+          "has_ball": false,
+          "bbox": [205, 438, 255, 518],
+          "position": [230, 518]
+        },
+        "2": {
+          "team": 1,
+          "position_transformed": [33.17621391810246, 35.763949843260164],
+          "has_ball": true,
+          "bbox": [346, 313, 396, 393],
+          "position": [371, 393]
+        },
+        "3": {
+          "team": 0,
+          "position_transformed": [37.80812262251066, 33.28495297805643],
+          "has_ball": false,
+          "bbox": [305, 259, 355, 339],
+          "position": [330, 339]
+        }
       },
-      "1": {
-        "team": 0,
-        "position_transformed": [32.0, 45.0]
+      "referees": {},
+      "ball": {
+        "1": {
+          "conf": 0.11,
+          "position_transformed": [33.17621391810246, 35.763949843260164],
+          "bbox": [356.0, 373.0, 366.0, 383.0],
+          "position": [361, 378]
+        }
       },
-      "2": {
-        "team": 0,
-        "position_transformed": [27.0, 39.0]
+      "goalkeeper": {},
+      "goalpost": {
+        "1": {
+          "position_transformed": [60, 42],
+          "position": [1800.0, 500.0]
+        }
       },
-      "3": {
-        "team": 1,
-        "position_transformed": [30.0, 31.0],
-        "has_ball": true
-      },
-      "4": {
-        "team": 0,
-        "position_transformed": [31.0, 27.0]
-      }
+      "action": 0
     },
-    "referees": {},
-    "ball": {
-      "1": {
-        "position_transformed": [30.2, 31.1]
-      }
+    {
+      "players": {
+        "0": {
+          "team": 1,
+          "position_transformed": [58.8, 44.099999999999994],
+          "has_ball": false,
+          "bbox": [485, 14, 535, 94],
+          "position": [510, 94]
+        },
+        "1": {
+          "team": 1,
+          "position_transformed": [22.435556052808202, 27.286833855799387],
+          "has_ball": false,
+          "bbox": [205, 438, 255, 518],
+          "position": [230, 518]
+        },
+        "2": {
+          "team": 1,
+          "position_transformed": [33.17621391810246, 35.763949843260164],
+          "has_ball": true,
+          "bbox": [346, 313, 396, 393],
+          "position": [371, 393]
+        },
+        "3": {
+          "team": 0,
+          "position_transformed": [37.80812262251066, 33.28495297805643],
+          "has_ball": false,
+          "bbox": [305, 259, 355, 339],
+          "position": [330, 339]
+        }
+      },
+      "referees": {},
+      "ball": {
+        "1": {
+          "conf": 0.11,
+          "position_transformed": [33.17621391810246, 35.763949843260164],
+          "bbox": [356.0, 373.0, 366.0, 383.0],
+          "position": [361, 378]
+        }
+      },
+      "goalkeeper": {},
+      "goalpost": {
+        "1": {
+          "position_transformed": [60, 42],
+          "position": [1800.0, 500.0]
+        }
+      },
+      "action": 0
     },
-    "action": 11
-  },
-  {
-    "players": {
-      "0": {
-        "team": 1,
-        "position_transformed": [33.0, 46.0]
+    {
+      "players": {
+        "0": {
+          "team": 1,
+          "position_transformed": [58.8, 44.099999999999994],
+          "has_ball": false,
+          "bbox": [485, 14, 535, 94],
+          "position": [510, 94]
+        },
+        "1": {
+          "team": 1,
+          "position_transformed": [22.435556052808202, 27.286833855799387],
+          "has_ball": false,
+          "bbox": [205, 438, 255, 518],
+          "position": [230, 518]
+        },
+        "2": {
+          "team": 1,
+          "position_transformed": [40.963190870440826, 47.56645768025075],
+          "has_ball": true,
+          "bbox": [543, 222, 593, 302],
+          "position": [568, 302]
+        },
+        "3": {
+          "team": 0,
+          "position_transformed": [37.80812262251066, 33.28495297805643],
+          "has_ball": false,
+          "bbox": [305, 259, 355, 339],
+          "position": [330, 339]
+        }
       },
-      "1": {
-        "team": 0,
-        "position_transformed": [35.0, 44.0]
+      "referees": {},
+      "ball": {
+        "1": {
+          "conf": 0.11,
+          "position_transformed": [40.963190870440826, 47.56645768025075],
+          "bbox": [553.0, 282.0, 563.0, 292.0],
+          "position": [558, 287]
+        }
       },
-      "2": {
-        "team": 0,
-        "position_transformed": [30.0, 37.0]
+      "goalkeeper": {},
+      "goalpost": {
+        "1": {
+          "position_transformed": [60, 42],
+          "position": [1800.0, 500.0]
+        }
       },
-      "3": {
-        "team": 1,
-        "position_transformed": [34.0, 32.5],
-        "has_ball": true
-      },
-      "4": {
-        "team": 0,
-        "position_transformed": [34.5, 28.0]
-      }
-    },
-    "referees": {},
-    "ball": {
-      "1": {
-        "position_transformed": [34.2, 32.6]
-      }
-    },
-    "action": 11
-  },
-  {
-    "players": {
-      "0": {
-        "team": 1,
-        "position_transformed": [37.0, 45.0]
-      },
-      "1": {
-        "team": 0,
-        "position_transformed": [39.0, 43.0]
-      },
-      "2": {
-        "team": 0,
-        "position_transformed": [34.0, 36.0]
-      },
-      "3": {
-        "team": 1,
-        "position_transformed": [38.0, 34.0],
-        "has_ball": true
-      },
-      "4": {
-        "team": 0,
-        "position_transformed": [38.5, 29.5]
-      }
-    },
-    "referees": {},
-    "ball": {
-      "1": {
-        "position_transformed": [38.2, 34.1]
-      }
-    },
-    "action": 2
-  },
-  {
-    "players": {
-      "0": {
-        "team": 1,
-        "position_transformed": [41.0, 44.0],
-        "has_ball": true
-      },
-      "1": {
-        "team": 0,
-        "position_transformed": [43.0, 42.0]
-      },
-      "2": {
-        "team": 0,
-        "position_transformed": [38.0, 35.0]
-      },
-      "3": {
-        "team": 1,
-        "position_transformed": [42.0, 33.0]
-      },
-      "4": {
-        "team": 0,
-        "position_transformed": [42.5, 31.0]
-      }
-    },
-    "referees": {},
-    "ball": {
-      "1": {
-        "position_transformed": [41.2, 44.1]
-      }
-    },
-    "action": 11
-  },
-  {
-    "players": {
-      "0": {
-        "team": 1,
-        "position_transformed": [47.0, 43.0],
-        "has_ball": true
-      },
-      "1": {
-        "team": 0,
-        "position_transformed": [49.0, 41.0]
-      },
-      "2": {
-        "team": 0,
-        "position_transformed": [44.0, 34.0]
-      },
-      "3": {
-        "team": 1,
-        "position_transformed": [48.0, 33.0]
-      },
-      "4": {
-        "team": 0,
-        "position_transformed": [47.5, 31.5]
-      }
-    },
-    "referees": {},
-    "ball": {
-      "1": {
-        "position_transformed": [47.2, 43.1]
-      }
-    },
-    "action": 16
-  }
+      "action": 16
+    }
+  ]
 ]
