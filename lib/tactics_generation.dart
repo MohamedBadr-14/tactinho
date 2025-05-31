@@ -407,8 +407,8 @@ class _TacticsRunState extends State<TacticsRun> {
                         if (ballPosition != null)
                           AnimatedPositioned(
                             duration: Duration(seconds: 1),
-                            left: ballPosition!.dx + 9,
-                            top: ballPosition!.dy - 15,
+                            left: ballPosition!.dx + (MediaQuery.of(context).size.width * 0.01),
+                            top: ballPosition!.dy - (MediaQuery.of(context).size.height * 0.03),
                             child: BallWidget(),
                           ),
                         // Add description text here - before the finish buttons
@@ -552,7 +552,7 @@ class PlayerDot extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.03,
-      height: MediaQuery.of(context).size.width * 0.03,
+      height: MediaQuery.of(context).size.height * 0.03,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: (team == 1)
@@ -573,7 +573,7 @@ class BallWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width * 0.015,
-      height: MediaQuery.of(context).size.width * 0.015,
+      height: MediaQuery.of(context).size.height * 0.015,
       decoration: BoxDecoration(
         color: Colors.deepOrangeAccent,
         shape: BoxShape.circle,

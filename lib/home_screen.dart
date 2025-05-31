@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tactinho/tactics_board.dart';
 import 'package:tactinho/scene_selection_screen.dart';
-import 'package:tactinho/seq.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -48,18 +47,6 @@ class HomeScreen extends StatelessWidget {
                 SizedBox(height: 16),
 
 
-
-         _ActionButton(
-                num: 2,
-                onPressed: () {
-                    // Navigate to the Scene Selection Screen
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                        builder: (context) =>SequenceBuilder(),
-                        ));
-                },
-                ),
 
 
               ],
