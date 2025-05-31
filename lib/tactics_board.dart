@@ -70,18 +70,34 @@ class _TacticsBoardState extends State<TacticsBoard> {
   }
 
   void _addGoalkeeper() {
-// Add goalkeeper at a fixed position near the top goal
+    // Add goalkeeper at a fixed position near the top goal
     setState(() {
       // Position is set at top-center of field (0.485, 0.02)
       fieldPlayers.add(
         PlayerFormation(
-          color: const Color.fromARGB(
-              255, 27, 3, 249), // Blue color for goalkeeper
+          color: const Color.fromARGB(255, 27, 3, 249), // Blue color for goalkeeper
           number: 3, // Goalkeeper number
           position: const Offset(0.485, 0.02), // Fixed position near top goal
         ),
       );
     });
+  }
+
+  // Method to update player position
+  void _updatePlayerPosition(int playerIndex, Offset newPosition, Size fieldSize) {
+    // Calculate transformed position for logging
+    final dx = newPosition.dx.clamp(0.0, 1.0);
+    final dy = newPosition.dy.clamp(0.0, 1.0);
+    final dxx = ((dx * 90 * (2 / 3)) + 15.0);
+    final positionTransformed = [60 - (dy * 60), dxx];
+
+    setState(() {
+      fieldPlayers[playerIndex] = fieldPlayers[playerIndex].copyWith(
+        position: Offset(dx, dy),
+      );
+    });
+
+    print('Player ${fieldPlayers[playerIndex].number} moved to position: $positionTransformed');
   }
 
   @override
@@ -94,7 +110,7 @@ class _TacticsBoardState extends State<TacticsBoard> {
           Container(
             color: const Color.fromARGB(255, 216, 206, 206),
             padding: const EdgeInsets.symmetric(vertical: 8),
-            height: 90,
+            height: 60,
             child: Row(
               children: [
                 // Undo Button
@@ -105,8 +121,7 @@ class _TacticsBoardState extends State<TacticsBoard> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF1E6C41),
                         foregroundColor: Colors.white,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       ),
                       onPressed: _undoLastPlayer,
                       child: const Text(
@@ -126,15 +141,13 @@ class _TacticsBoardState extends State<TacticsBoard> {
                         children: List.generate(2, (index) {
                           final player = PlayerFormation(
                             color: index == 0
-                                ? const Color.fromARGB(
-                                    255, 255, 255, 0) // Yellow
+                                ? const Color.fromARGB(255, 255, 255, 0) // Yellow
                                 : const Color.fromARGB(255, 255, 55, 0), // Red
                             number: index + 1,
                           );
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 2),
-                            child: (player.number == 1 &&
-                                        yellowPlayerCount >= 2) ||
+                            child: (player.number == 1 && yellowPlayerCount >= 2) ||
                                     (player.number == 2 && redPlayerCount >= 3)
                                 ? Opacity(
                                     opacity: 0.4,
@@ -175,8 +188,7 @@ class _TacticsBoardState extends State<TacticsBoard> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1E6C41),
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       ),
                       onPressed: _clearPlayers,
                       child: const Text(
@@ -191,23 +203,23 @@ class _TacticsBoardState extends State<TacticsBoard> {
           ),
 
           Container(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height *
-                  0.2, // 2% of screen height
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final fieldSize = constraints.biggest;
-                  return Stack(
-                    children: [
-                      // Draw Goal
-                      CustomPaint(
-                        size: fieldSize,
-                        painter: Goal(),
-                      ),
-                    ],
-                  );
-                },
-              )),
+            width: double.infinity,
+            height: MediaQuery.of(context).size.height * 0.2, // 20% of screen height
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final fieldSize = constraints.biggest;
+                return Stack(
+                  children: [
+                    // Draw Goal
+                    CustomPaint(
+                      size: fieldSize,
+                      painter: Goal(),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
 
           // Football Field
           Expanded(
@@ -221,10 +233,8 @@ class _TacticsBoardState extends State<TacticsBoard> {
                     MouseRegion(
                       onHover: (event) {
                         final localOffset = event.localPosition;
-                        final dx =
-                            (localOffset.dx / fieldSize.width).clamp(0.0, 1.0);
-                        final dy =
-                            (localOffset.dy / fieldSize.height).clamp(0.0, 1.0);
+                        final dx = (localOffset.dx / fieldSize.width).clamp(0.0, 1.0);
+                        final dy = (localOffset.dy / fieldSize.height).clamp(0.0, 1.0);
 
                         // Update without forcing a full rebuild
                         if (mounted) {
@@ -252,16 +262,10 @@ class _TacticsBoardState extends State<TacticsBoard> {
                                 0,
                                 AppBar().preferredSize.height +
                                     MediaQuery.of(context).padding.top +
-                                    MediaQuery.of(context).size.height *
-                                        0.2, // Reserve space for top controls
+                                    MediaQuery.of(context).size.height * 0.2, // Reserve space for top controls
                               );
-                          var dx = (localOffset.dx / fieldSize.width)
-                              .clamp(0.0, 1.0);
-                          final dy = (localOffset.dy / fieldSize.height)
-                              .clamp(0.0, 1.0);
-
-                          // var tmp_dx = (localOffset.dx / fieldSize.width);
-                          // print ("tmp_dx: $tmp_dx");
+                          var dx = (localOffset.dx / fieldSize.width).clamp(0.0, 1.0);
+                          final dy = (localOffset.dy / fieldSize.height).clamp(0.0, 1.0);
 
                           var dxx = ((dx * 90 * (2 / 3)) + 15.0);
                           print("dxx: $dxx");
@@ -280,8 +284,11 @@ class _TacticsBoardState extends State<TacticsBoard> {
                               ),
                             );
                           });
-                          print(
-                              'Player added: ${details.data.number} at position: $positionTransformed');
+                          print('Player added: ${details.data.number} at position: $positionTransformed');
+                        },
+                        // NEW: Add DragTarget for repositioning existing players
+                        onAccept: (PlayerFormation player) {
+                          // This will be handled by individual player drag targets
                         },
                         builder: (context, candidateData, rejectedData) {
                           return CustomPaint(
@@ -292,7 +299,7 @@ class _TacticsBoardState extends State<TacticsBoard> {
                       ),
                     ),
 
-                    // Draw Players
+                    // Draw Players with Draggable functionality for repositioning
                     ...fieldPlayers.asMap().entries.map((entry) {
                       final index = entry.key;
                       final player = entry.value;
@@ -304,39 +311,84 @@ class _TacticsBoardState extends State<TacticsBoard> {
                       return Positioned(
                         left: position.dx,
                         top: position.dy,
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              if (player.ballpossession) {
-                                // Remove possession if player already has it
-                                has_Ball = false;
-                                fieldPlayers[index] =
-                                    player.copyWith(ballpossession: false);
-                              } else {
-                                // Remove from all players
-                                if (player.number == 1) {
-                                  for (int i = 0;
-                                      i < fieldPlayers.length;
-                                      i++) {
-                                    fieldPlayers[i] = fieldPlayers[i]
-                                        .copyWith(ballpossession: false);
-                                  }
-                                }
-                                // Give possession to this player
-                                if (player.number == 1) {
-                                  has_Ball = true;
-
-                                  fieldPlayers[index] =
-                                      player.copyWith(ballpossession: true);
-                                }
-                              }
-                            });
+                        child: DragTarget<PlayerRepositionData>(
+                          onAcceptWithDetails: (details) {
+                            // This is no longer needed since we handle repositioning in onDragEnd
                           },
-                          child: PlayerCircle(
-                            color: player.color,
-                            number: player.number,
-                            highlight: player.ballpossession,
-                          ),
+                          builder: (context, candidateData, rejectedData) {
+                            return Draggable<PlayerRepositionData>(
+                              data: PlayerRepositionData(
+                                player: player,
+                                playerIndex: index,
+                              ),
+                              feedback: Transform.scale(
+                                scale: 1.2,
+                                child: PlayerCircle(
+                                  color: player.color,
+                                  number: player.number,
+                                  highlight: player.ballpossession,
+                                ),
+                              ),
+                              childWhenDragging: Opacity(
+                                opacity: 0.3,
+                                child: PlayerCircle(
+                                  color: player.color,
+                                  number: player.number,
+                                  highlight: player.ballpossession,
+                                ),
+                              ),
+                              onDragEnd: (details) {
+                                // Use the same position calculation logic as the original DragTarget
+                                final localOffset = details.offset -
+                                    Offset(
+                                      0,
+                                      AppBar().preferredSize.height +
+                                          MediaQuery.of(context).padding.top +
+                                          MediaQuery.of(context).size.height * 0.2, // Reserve space for top controls
+                                    );
+                                
+                                print("localOffset: $localOffset");
+                                
+                                var dx = (localOffset.dx / fieldSize.width).clamp(0.0, 1.0);
+                                final dy = (localOffset.dy / fieldSize.height).clamp(0.0, 1.0);
+                                
+                                print("dx: $dx, dy: $dy");
+                                
+                                // Only update if the drop is within the field bounds
+                                if (dx >= 0.0 && dx <= 1.0 && dy >= 0.0 && dy <= 1.0) {
+                                  _updatePlayerPosition(index, Offset(dx, dy), fieldSize);
+                                }
+                              },
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    if (player.ballpossession) {
+                                      // Remove possession if player already has it
+                                      has_Ball = false;
+                                      fieldPlayers[index] = player.copyWith(ballpossession: false);
+                                    } else {
+                                      // Remove from all players
+                                      if (player.number == 1) {
+                                        for (int i = 0; i < fieldPlayers.length; i++) {
+                                          fieldPlayers[i] = fieldPlayers[i].copyWith(ballpossession: false);
+                                        }
+                                      }
+                                      // Give possession to this player
+                                      if (player.number == 1) {
+                                        has_Ball = true;
+                                        fieldPlayers[index] = player.copyWith(ballpossession: true);
+                                      }
+                                    }
+                                  });
+                                },
+                                child: PlayerCircle(
+                                  color: player.color,
+                                  number: player.number,
+                                  highlight: player.ballpossession,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       );
                     }),
@@ -347,8 +399,7 @@ class _TacticsBoardState extends State<TacticsBoard> {
                         left: _mousePosition!.dx + 10,
                         top: _mousePosition!.dy - 30,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: Colors.black.withOpacity(0.7),
                             borderRadius: BorderRadius.circular(4),
@@ -379,8 +430,7 @@ class _TacticsBoardState extends State<TacticsBoard> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1E6C41),
                   foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 ),
                 onPressed: () {
                   if (!has_Ball) {
@@ -412,8 +462,7 @@ class _TacticsBoardState extends State<TacticsBoard> {
                   } else {
                     Navigator.of(context).pushReplacement(
                       MaterialPageRoute(
-                        builder: (context) => PrecacheScreen(
-                            scene: fieldPlayers), // Replace with your widget
+                        builder: (context) => PrecacheScreen(scene: fieldPlayers), // Replace with your widget
                       ),
                     );
                   }
@@ -431,7 +480,16 @@ class _TacticsBoardState extends State<TacticsBoard> {
   }
 }
 
-// ...existing code...
+// NEW: Data class for player repositioning
+class PlayerRepositionData {
+  final PlayerFormation player;
+  final int playerIndex;
+
+  PlayerRepositionData({
+    required this.player,
+    required this.playerIndex,
+  });
+}
 
 // Player Model
 class PlayerFormation {
@@ -497,5 +555,3 @@ class PlayerCircle extends StatelessWidget {
     );
   }
 }
-
-// Field Painter

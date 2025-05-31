@@ -348,7 +348,7 @@ class SceneMatcher:
 # Initialize with your training data
 # scenes=load_sequences_from_json("db.json")
 # scenes = [load_sequences_from_json("AI_2.json")]
-scenes = load_sequences_from_json("dbz.json")  # Load your actual training sequences
+scenes = load_sequences_from_json("dba.json")  # Load your actual training sequences
 matcher = SceneMatcher(scenes)  # Pass your actual training sequences
 
 @app.route('/api/get_all_first_scenes', methods=['GET'])

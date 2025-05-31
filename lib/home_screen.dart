@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tactinho/tactics_board.dart';
 import 'package:tactinho/scene_selection_screen.dart';
-
+import 'package:tactinho/seq.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -35,6 +35,7 @@ class HomeScreen extends StatelessWidget {
                 const _RoadmapSection(),
                 const SizedBox(height: 32),
                 _ActionButton(
+                num: 1,
                 onPressed: () {
                     // Navigate to the Scene Selection Screen
                     Navigator.push(
@@ -44,6 +45,23 @@ class HomeScreen extends StatelessWidget {
                         ));
                 },
                 ),
+                SizedBox(height: 16),
+
+
+
+         _ActionButton(
+                num: 2,
+                onPressed: () {
+                    // Navigate to the Scene Selection Screen
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                        builder: (context) =>SequenceBuilder(),
+                        ));
+                },
+                ),
+
+
               ],
             ),
           ),
@@ -212,8 +230,9 @@ class _RoadmapSection extends StatelessWidget {
 
 class _ActionButton extends StatelessWidget {
   final VoidCallback onPressed;
+  final int num;
 
-  const _ActionButton({required this.onPressed});
+  const _ActionButton({required this.onPressed,required this.num});
 
   @override
   Widget build(BuildContext context) {
@@ -232,8 +251,8 @@ class _ActionButton extends StatelessWidget {
           ),
           elevation: 2,
         ),
-        child: const Text(
-          'Get Started',
+        child:  Text(num == 1 ?
+          'Get Started':'Continue',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
