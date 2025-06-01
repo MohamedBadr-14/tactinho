@@ -7,6 +7,7 @@ from sklearn.neighbors import NearestNeighbors
 import json
 from flask_cors import CORS
 from scipy.optimize import linear_sum_assignment
+import random
 
 def load_sequences_from_json(json_path):
     """
@@ -349,6 +350,9 @@ class SceneMatcher:
 # scenes=load_sequences_from_json("db.json")
 # scenes = [load_sequences_from_json("AI_2.json")]
 scenes = load_sequences_from_json("dba.json")  # Load your actual training sequences
+random.shuffle(scenes)
+# SHUFFLE SCENES 
+
 matcher = SceneMatcher(scenes)  # Pass your actual training sequences
 
 @app.route('/api/get_all_first_scenes', methods=['GET'])

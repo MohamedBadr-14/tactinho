@@ -408,7 +408,7 @@ class _TacticsRunState extends State<TacticsRun> {
                           AnimatedPositioned(
                             duration: Duration(seconds: 1),
                             left: ballPosition!.dx + (MediaQuery.of(context).size.width * 0.01),
-                            top: ballPosition!.dy - (MediaQuery.of(context).size.height * 0.03),
+                            top: ballPosition!.dy - (MediaQuery.of(context).size.width * 0.025),
                             child: BallWidget(),
                           ),
                         // Add description text here - before the finish buttons

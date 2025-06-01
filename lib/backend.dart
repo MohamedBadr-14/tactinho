@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 Future<List<List<Map<String, dynamic>>>> sendPlayerData(var jsonSend) async {
   // On Android emulator, use 10.0.2.2 to reach your host machine’s localhost.
   // On iOS simulator or a real device, replace with your machine’s LAN IP or use ngrok.
-  final uri = Uri.parse('http://127.0.0.1:5000/api/predict_sequence');
+  final uri = Uri.parse('http://172.20.10.9:5000/api/predict_sequence');
 
   List<List<Map<String, dynamic>>> allScenes = [];
   // print('Sending data to server: ${jsonEncode(jsonSend)}');
@@ -19,22 +19,21 @@ Future<List<List<Map<String, dynamic>>>> sendPlayerData(var jsonSend) async {
       body: jsonEncode({'scene': jsonSend}),
     );
     // print(jsonSend);
-                  Map<String, dynamic> Shoot_object_2 = {
-                "color": 4278190080, 
-                "number":99,
-                "position": {"dx": 0.53, "dy":  -0.01},
-                "ballpossession": false,
-                "team": 3
-              };
+    Map<String, dynamic> Shoot_object_2 = {
+      "color": 4278190080,
+      "number": 99,
+      "position": {"dx": 0.53, "dy": -0.02},
+      "ballpossession": false,
+      "team": 3
+    };
 
-                      Map<String, dynamic> Shoot_object_1 = {
-                "color": 4278190080, 
-                "number":500,
-                "position": {"dx": 0.44, "dy":  -0.01},
-                "ballpossession": false,
-                "team": 3
-              };
-  
+    Map<String, dynamic> Shoot_object_1 = {
+      "color": 4278190080,
+      "number": 500,
+      "position": {"dx": 0.44, "dy": -0.02},
+      "ballpossession": false,
+      "team": 3
+    };
 
     List<Map<String, dynamic>> lastscene = [];
     if (response.statusCode == 200 || response.statusCode == 201) {
@@ -84,71 +83,64 @@ Future<List<List<Map<String, dynamic>>>> sendPlayerData(var jsonSend) async {
           }
 
           // Add goalkeeper if exists
-        
-       
-    
-              Map<String, dynamic> keeperObject = {
-                "color": 4278190080, 
-                "number":97,
-                "position": {"dx": 0.485, "dy":  0.02},
-                "ballpossession": false,
-                "team": 3
-              };
 
+          Map<String, dynamic> keeperObject = {
+            "color": 4278190080,
+            "number": 97,
+            "position": {"dx": 0.485, "dy": 0.02},
+            "ballpossession": false,
+            "team": 3
+          };
 
-              scenePlayersList.add(keeperObject);
+          scenePlayersList.add(keeperObject);
 
 // Create a copy of scenePlayersList instead of just a reference
-lastscene = List<Map<String, dynamic>>.from(scenePlayersList);              scenePlayersList.add(Shoot_object_1);
+          lastscene = List<Map<String, dynamic>>.from(scenePlayersList);
+          scenePlayersList.add(Shoot_object_1);
 
-              scenePlayersList.add(Shoot_object_2);
-        
+          scenePlayersList.add(Shoot_object_2);
+
           // action: 2 example of action
-          if (scene.containsKey('action')){
-            scenePlayersList.add({
-              "action": scene['action']});
-          } 
+          if (scene.containsKey('action')) {
+            scenePlayersList.add({"action": scene['action']});
+          }
           // Add scene to all scenes
           allScenes.add(scenePlayersList);
         }
-     
       }
-      
+
       List<Map<String, dynamic>> Shootsceen = [];
       print("daksdkas $lastscene");
       for (var player in lastscene) {
         Map<String, dynamic> playerCopy = Map<String, dynamic>.from(player);
         playerCopy['ballpossession'] = false;
-      
+
         Shootsceen.add(playerCopy);
       }
       print("Shootsceen: $Shootsceen");
 
-    // Generate random number (1 or 2)
-        final random = Random();
-        final randomNumber = random.nextInt(2) + 1; // Random number between 1 and 2
+      // Generate random number (1 or 2)
+      final random = Random();
+      final randomNumber =
+          random.nextInt(2) + 1; // Random number between 1 and 2
 
-        print('Random number generated: $randomNumber');
-        
+      print('Random number generated: $randomNumber');
+
       if (randomNumber == 1) {
         // Add Shoot_object_1 to Shootsceen
-              Shoot_object_1['ballpossession'] = true;
-
+        Shoot_object_1['ballpossession'] = true;
       } else {
         // Add Shoot_object_2 to Shootsceen
-              Shoot_object_2['ballpossession'] = true;
+        Shoot_object_2['ballpossession'] = true;
       }
       Shootsceen.add(Shoot_object_1);
       Shootsceen.add(Shoot_object_2);
-      Shootsceen.add({
-              "action": 16});
-          
+      Shootsceen.add({"action": 16});
+
       allScenes.add(Shootsceen);
 
-
       print(allScenes);
-      
-    
+
       return allScenes;
 
       // Success!

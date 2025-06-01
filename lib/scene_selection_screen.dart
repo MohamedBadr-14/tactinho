@@ -37,7 +37,7 @@ class _SceneSelectionScreenState extends State<SceneSelectionScreen> {
     });
 
     try {
-      final uri = Uri.parse('http://127.0.0.1:5000/api/get_all_first_scenes');
+      final uri = Uri.parse('http://172.20.10.9:5000/api/get_all_first_scenes');
       final response = await http.get(uri);
 
       if (response.statusCode == 200) {
