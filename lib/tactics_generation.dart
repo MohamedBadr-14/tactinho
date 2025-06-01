@@ -129,12 +129,12 @@ class _PrecacheScreenState extends State<PrecacheScreen> {
 }
 
 class TacticsRun extends StatefulWidget {
-  final List<Image> pepFrames;
-  final String jsonString;
-  TacticsRun({required this.pepFrames, required this.jsonString});
+final List<Image> pepFrames;
+final String jsonString;
+TacticsRun({required this.pepFrames, required this.jsonString});
 
-  @override
-  _TacticsRunState createState() => _TacticsRunState();
+@override
+_TacticsRunState createState() => _TacticsRunState();
 }
 
 class _TacticsRunState extends State<TacticsRun> {
@@ -149,10 +149,12 @@ class _TacticsRunState extends State<TacticsRun> {
   Timer? _talkingAnimationTimer;
   late List<Image> _pepFrames;
   int counter = 0;
-  Offset? ballPosition;
-  List<TacticItem> tactics = [];
+Offset? ballPosition;
+List<TacticItem> tactics = [];
 
-  final GlobalKey _fieldKey = GlobalKey();
+final GlobalKey _fieldKey = GlobalKey();
+final GlobalKey _safeAreaKey = GlobalKey();
+double? _safeAreaTopPadding;
 
   final List<String> _descriptions = [
     "Player 1 starts with the ball.",
@@ -223,15 +225,38 @@ class _TacticsRunState extends State<TacticsRun> {
     } catch (e) {
       print('Error saving screenshot: $e');
     }
-  }
+}
 
-  @override
-  void initState() {
-    super.initState();
-    _pepFrames = widget.pepFrames;
-    _loadFormationsFromJson();
-    Future.delayed(const Duration(milliseconds: 500), _startAnimationLoop);
-  }
+double getSafeAreaTopPadding() {
+if (_safeAreaTopPadding != null) {
+    return _safeAreaTopPadding!;
+}
+
+try {
+    final RenderBox renderBox = _safeAreaKey.currentContext?.findRenderObject() as RenderBox;
+    final Offset topLeft = renderBox.localToGlobal(Offset.zero);
+    _safeAreaTopPadding = topLeft.dy;
+    return _safeAreaTopPadding!;
+} catch (e) {
+    print('Error getting SafeArea padding: $e');
+    return MediaQuery.of(context).padding.top;
+}
+}
+
+@override
+void initState() {
+super.initState();
+_pepFrames = widget.pepFrames;
+_loadFormationsFromJson();
+
+// Delay to ensure the SafeArea is rendered before getting its position
+Future.delayed(const Duration(milliseconds: 500), () {
+    setState(() {
+    getSafeAreaTopPadding();
+    });
+    _startAnimationLoop();
+});
+}
 
   @override
   void dispose() {
@@ -258,12 +283,12 @@ class _TacticsRunState extends State<TacticsRun> {
         final ballPlayer = currentPlayers.firstWhere((p) => p.ballpossession,
             orElse: () => currentPlayers[0]);
         ballPosition = Offset(
-          ballPlayer.position.dx * MediaQuery.of(context).size.width,
-          ballPlayer.position.dy *
-              (((MediaQuery.of(context).size.height) -MediaQuery.of(context).padding.top
-                     ) *
-                  6 /
-                  7),
+        ballPlayer.position.dx * MediaQuery.of(context).size.width,
+        ballPlayer.position.dy *
+            (((MediaQuery.of(context).size.height) - getSafeAreaTopPadding()
+                    ) *
+                6 /
+                7),
         );
         _startTalkingAnimation();
       });
@@ -338,8 +363,9 @@ class _TacticsRunState extends State<TacticsRun> {
   @override
   Widget build(BuildContext context) {
     return 
-       SafeArea( 
-         child: Scaffold(
+    SafeArea(
+        key: _safeAreaKey,
+        child: Scaffold(
           body: Container(
             color: const Color(0xFF1E6C41),
             child: Column(
@@ -421,7 +447,7 @@ class _TacticsRunState extends State<TacticsRun> {
                                 left: ballPosition!.dx +
                                     (MediaQuery.of(context).size.width * 0.01),
                                 top: ballPosition!.dy -
-                                    (MediaQuery.of(context).size.height * 0.03)+15,
+                                    (MediaQuery.of(context).size.height * 0.01),
                                 child: BallWidget(),
                               ),
                             // Add description text here - before the finish buttons
