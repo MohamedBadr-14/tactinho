@@ -11,6 +11,7 @@ class TacticsBoard extends StatefulWidget {
 }
 
 class _TacticsBoardState extends State<TacticsBoard> {
+final _dragTargetKey = GlobalKey();
   List<PlayerFormation> fieldPlayers = [];
   var has_Ball = false;
   var goalkeeper_selected = true; // Always true since we auto-add goalkeeper
@@ -106,7 +107,6 @@ class _TacticsBoardState extends State<TacticsBoard> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      minimum: const EdgeInsets.only(top: 60),
       child: Container(
         color: Color(0xFF1E6C41),
         child: Column(
@@ -271,19 +271,16 @@ class _TacticsBoardState extends State<TacticsBoard> {
                           }
                         },
                         child: DragTarget<PlayerFormation>(
-                          onAcceptWithDetails: (details) {
-                            final localOffset = details.offset -
-                                Offset(
-                                  0,
-                                  // AppBar().preferredSize.height +
-
-                                  60 + 60 +
-                                      MediaQuery.of(context).padding.top +
-                                      MediaQuery.of(context).size.height *
-                                          0.2, // Reserve space for top controls
-                                );
-                            print("PADDING TOP");
-                            print(MediaQuery.of(context).padding.top);
+                        key: _dragTargetKey,
+                        onAcceptWithDetails: (details) {
+                        // Get the actual position of the DragTarget in global coordinates
+                        final RenderBox renderBox = _dragTargetKey.currentContext!.findRenderObject() as RenderBox;
+                        final dragTargetPosition = renderBox.localToGlobal(Offset.zero);
+                        
+                        // Calculate the offset relative to the DragTarget
+                        final localOffset = details.offset - dragTargetPosition;
+                        
+                        print("DragTarget position: $dragTargetPosition");
                             var dx = (localOffset.dx / fieldSize.width)
                                 .clamp(0.0, 1.0);
                             final dy = (localOffset.dy / fieldSize.height)
@@ -361,15 +358,12 @@ class _TacticsBoardState extends State<TacticsBoard> {
                                   ),
                                 ),
                                 onDragEnd: (details) {
-                                  // Use the same position calculation logic as the original DragTarget
-                                  final localOffset = details.offset -
-                                      Offset(
-                                        0,
-                                        60 +
-                                            MediaQuery.of(context).padding.top +
-                                            MediaQuery.of(context).size.height *
-                                                0.2, // Reserve space for top controls
-                                      );
+                                // Get the actual position of the DragTarget in global coordinates
+                                final RenderBox renderBox = _dragTargetKey.currentContext!.findRenderObject() as RenderBox;
+                                final dragTargetPosition = renderBox.localToGlobal(Offset.zero);
+                                
+                                // Calculate the offset relative to the DragTarget
+                                final localOffset = details.offset - dragTargetPosition;
 
                                   print("localOffset: $localOffset");
 

@@ -101,175 +101,177 @@ class _SceneSelectionScreenState extends State<SceneSelectionScreen> {
 Widget build(BuildContext context) {
   final colorScheme = Theme.of(context).colorScheme;
 
-  return Scaffold(
-    appBar: AppBar(
-      title: Text(
-        'Select Scene',
-        style: TextStyle(color: colorScheme.onPrimary),
+  return SafeArea(
+    child: Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Select Scene',
+          style: TextStyle(color: colorScheme.onPrimary),
+        ),
+        backgroundColor: colorScheme.primary,
       ),
-      backgroundColor: colorScheme.primary,
-    ),
-    body: isLoading
-        ? Center(child: CircularProgressIndicator())
-        : errorMessage.isNotEmpty
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : errorMessage.isNotEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(errorMessage),
+                      SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _fetchFirstScenes,
+                        child: Text('Retry'),
+                      ),
+                    ],
+                  ),
+                )
+              : Stack(
                   children: [
-                    Text(errorMessage),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: _fetchFirstScenes,
-                      child: Text('Retry'),
-                    ),
-                  ],
-                ),
-              )
-            : Stack(
-                children: [
-                  SingleChildScrollView(
-                    controller: _scrollController,
-                    child: Column(
-                      children: [
-                        // ... your existing widgets ...
-                        Container(
-                          width: double.infinity,
-                          child: Card(
-                            elevation: 4,
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TacticsBoard(),
-                                  ),
-                                );
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(20.0),
-                                child: Column(
-                                  children: [
-                                    Icon(
-                                      Icons.create,
-                                      size: 48,
-                                      color: colorScheme.primary,
+                    SingleChildScrollView(
+                      controller: _scrollController,
+                      child: Column(
+                        children: [
+                          // ... your existing widgets ...
+                          Container(
+                            width: double.infinity,
+                            child: Card(
+                              elevation: 4,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => TacticsBoard(),
                                     ),
-                                    SizedBox(height: 16),
-                                    Text(
-                                      'Create Your Own Scene',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
+                                  );
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Column(
+                                    children: [
+                                      Icon(
+                                        Icons.create,
+                                        size: 48,
+                                        color: colorScheme.primary,
                                       ),
-                                    ),
-                                    SizedBox(height: 8),
-                                    Text(
-                                      'Set up your own player positions and generate tactics',
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ],
+                                      SizedBox(height: 16),
+                                      Text(
+                                        'Create Your Own Scene',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        'Set up your own player positions and generate tactics',
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 24),
-                        Text(
-                          'Or choose from existing scenes:',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                          SizedBox(height: 24),
+                          Text(
+                            'Or choose from existing scenes:',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 16),
-                        firstScenes.isEmpty
-                            ? Center(
-                                child: Text('No existing scenes available'),
-                              )
-                            : GridView.builder(
-                                shrinkWrap: true,
-                                physics: NeverScrollableScrollPhysics(),
-                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 10,
-                                  mainAxisSpacing: 10,
-                                ),
-                                itemCount: firstScenes.length,
-                                itemBuilder: (context, index) {
-                                  return Card(
-                                    clipBehavior: Clip.antiAlias,
-                                    child: InkWell(
-                                      onTap: () {
-                                        final scene = firstScenes[index];
-                                        final playerFormations = _convertToPlayerFormations(scene);
-
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => PrecacheScreen(
-                                              scene: playerFormations,
+                          SizedBox(height: 16),
+                          firstScenes.isEmpty
+                              ? Center(
+                                  child: Text('No existing scenes available'),
+                                )
+                              : GridView.builder(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10,
+                                  ),
+                                  itemCount: firstScenes.length,
+                                  itemBuilder: (context, index) {
+                                    return Card(
+                                      clipBehavior: Clip.antiAlias,
+                                      child: InkWell(
+                                        onTap: () {
+                                          final scene = firstScenes[index];
+                                          final playerFormations = _convertToPlayerFormations(scene);
+    
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => PrecacheScreen(
+                                                scene: playerFormations,
+                                              ),
                                             ),
-                                          ),
-                                        );
-                                      },
-                                      child: Column(
-                                        children: [
-                                          Expanded(
-                                            child: Container(
-                                              color: Colors.green.shade800,
-                                              child: Center(
-                                                child: SizedBox(
-                                                  width: double.infinity,
-                                                  height: double.infinity,
-                                                  child: CustomPaint(
-                                                    painter: MiniFieldPainter(
-                                                      players: _convertToPlayerFormations(firstScenes[index]),
+                                          );
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Expanded(
+                                              child: Container(
+                                                color: Colors.green.shade800,
+                                                child: Center(
+                                                  child: SizedBox(
+                                                    width: double.infinity,
+                                                    height: double.infinity,
+                                                    child: CustomPaint(
+                                                      painter: MiniFieldPainter(
+                                                        players: _convertToPlayerFormations(firstScenes[index]),
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              'Scene ${index + 1}',
-                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Text(
+                                                'Scene ${index + 1}',
+                                                style: TextStyle(fontWeight: FontWeight.bold),
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                },
-                              ),
-                        SizedBox(height: 80), // Add space so content is not hidden behind button
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    right: 16,
-                    bottom: 16,
-                    child: FloatingActionButton(
-                      backgroundColor: Color(0xFF1E6C41),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                                    );
+                                  },
+                                ),
+                          SizedBox(height: 80), // Add space so content is not hidden behind button
+                        ],
                       ),
-                      onPressed: () {
-                        _scrollController.animateTo(
-                          0,
-                          duration: Duration(milliseconds: 500),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      child: Icon(Icons.arrow_upward,
-                        color: Colors.white,
-                      ),
-                  
                     ),
-                  ),
-                ],
-              ),
+                    Positioned(
+                      right: 16,
+                      bottom: 16,
+                      child: FloatingActionButton(
+                        backgroundColor: Color(0xFF1E6C41),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        onPressed: () {
+                          _scrollController.animateTo(
+                            0,
+                            duration: Duration(milliseconds: 500),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                        child: Icon(Icons.arrow_upward,
+                          color: Colors.white,
+                        ),
+                    
+                      ),
+                    ),
+                  ],
+                ),
+    ),
   );
 }
 }
