@@ -228,6 +228,26 @@ final _dragTargetKey = GlobalKey();
                         size: fieldSize,
                         painter: Goal(),
                       ),
+
+         Positioned(
+                            top: 50,
+                            left: 50,
+                            right: 50,
+                             child: Center( child: 
+                                                       Container(
+                              width: fieldSize.width*0.7,
+                              height: 0.5 * fieldSize.height,
+                              
+                                child: Image.asset(
+                                  'assets/logo.png', // Your goal image path
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                                                       ),
+                           ),
+
+
+
                     ],
                   );
                 },

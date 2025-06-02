@@ -5,10 +5,8 @@ class Goal extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final fieldWidth = size.width;
-    final fieldHeight = size.height; // Reserve 20% for the bottom edge
+    final fieldHeight = size.height; 
 
-    // Calculate scaling factors to map coordinates to actual pixel positions
-    // Field dimensions: 90 width × 60 height
     final scaleX = fieldWidth / 60.0;
     final scaleY = fieldHeight / 60.0;
 

@@ -103,8 +103,8 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                 scale: _pulseAnimation,
                 child: Center(
                   child: Container(
-                    width: 200,
-                    height: 200,
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    height: MediaQuery.of(context).size.width * 0.2,
                     // decoration: BoxDecoration(
                     //   color: colorScheme.primary,
                     //   borderRadius: BorderRadius.circular(20),
@@ -119,9 +119,9 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                     child: Center(
                       child: Image.asset(
                         'assets/logo.png', // Replace with your logo asset
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        height: MediaQuery.of(context).size.width * 0.2,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),

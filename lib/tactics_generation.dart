@@ -50,7 +50,6 @@ class _PrecacheScreenState extends State<PrecacheScreen> {
     bool has_Ball = false;
     for (var player in scene) {
       if (player.ballpossession) {
-        
         has_Ball = true;
         toSend["ball"]?['1'] = {
           "conf": 0.11,
@@ -129,12 +128,12 @@ class _PrecacheScreenState extends State<PrecacheScreen> {
 }
 
 class TacticsRun extends StatefulWidget {
-final List<Image> pepFrames;
-final String jsonString;
-TacticsRun({required this.pepFrames, required this.jsonString});
+  final List<Image> pepFrames;
+  final String jsonString;
+  TacticsRun({required this.pepFrames, required this.jsonString});
 
-@override
-_TacticsRunState createState() => _TacticsRunState();
+  @override
+  _TacticsRunState createState() => _TacticsRunState();
 }
 
 class _TacticsRunState extends State<TacticsRun> {
@@ -149,12 +148,12 @@ class _TacticsRunState extends State<TacticsRun> {
   Timer? _talkingAnimationTimer;
   late List<Image> _pepFrames;
   int counter = 0;
-Offset? ballPosition;
-List<TacticItem> tactics = [];
+  Offset? ballPosition;
+  List<TacticItem> tactics = [];
 
-final GlobalKey _fieldKey = GlobalKey();
-final GlobalKey _safeAreaKey = GlobalKey();
-double? _safeAreaTopPadding;
+  final GlobalKey _fieldKey = GlobalKey();
+  final GlobalKey _safeAreaKey = GlobalKey();
+  double? _safeAreaTopPadding;
 
   final List<String> _descriptions = [
     "Player 1 starts with the ball.",
@@ -225,38 +224,39 @@ double? _safeAreaTopPadding;
     } catch (e) {
       print('Error saving screenshot: $e');
     }
-}
+  }
 
-double getSafeAreaTopPadding() {
-if (_safeAreaTopPadding != null) {
-    return _safeAreaTopPadding!;
-}
+  double getSafeAreaTopPadding() {
+    if (_safeAreaTopPadding != null) {
+      return _safeAreaTopPadding!;
+    }
 
-try {
-    final RenderBox renderBox = _safeAreaKey.currentContext?.findRenderObject() as RenderBox;
-    final Offset topLeft = renderBox.localToGlobal(Offset.zero);
-    _safeAreaTopPadding = topLeft.dy;
-    return _safeAreaTopPadding!;
-} catch (e) {
-    print('Error getting SafeArea padding: $e');
-    return MediaQuery.of(context).padding.top;
-}
-}
+    try {
+      final RenderBox renderBox =
+          _safeAreaKey.currentContext?.findRenderObject() as RenderBox;
+      final Offset topLeft = renderBox.localToGlobal(Offset.zero);
+      _safeAreaTopPadding = topLeft.dy;
+      return _safeAreaTopPadding!;
+    } catch (e) {
+      print('Error getting SafeArea padding: $e');
+      return MediaQuery.of(context).padding.top;
+    }
+  }
 
-@override
-void initState() {
-super.initState();
-_pepFrames = widget.pepFrames;
-_loadFormationsFromJson();
+  @override
+  void initState() {
+    super.initState();
+    _pepFrames = widget.pepFrames;
+    _loadFormationsFromJson();
 
 // Delay to ensure the SafeArea is rendered before getting its position
-Future.delayed(const Duration(milliseconds: 500), () {
-    setState(() {
-    getSafeAreaTopPadding();
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() {
+        getSafeAreaTopPadding();
+      });
+      _startAnimationLoop();
     });
-    _startAnimationLoop();
-});
-}
+  }
 
   @override
   void dispose() {
@@ -283,12 +283,13 @@ Future.delayed(const Duration(milliseconds: 500), () {
         final ballPlayer = currentPlayers.firstWhere((p) => p.ballpossession,
             orElse: () => currentPlayers[0]);
         ballPosition = Offset(
-        ballPlayer.position.dx * MediaQuery.of(context).size.width,
-        ballPlayer.position.dy *
-            (((MediaQuery.of(context).size.height) - getSafeAreaTopPadding()
-                    ) *
-                6 /
-                7),
+          ballPlayer.position.dx * MediaQuery.of(context).size.width,
+          ballPlayer.position.dy *
+              (((MediaQuery.of(context).size.height) -
+                      getSafeAreaTopPadding() -
+                      MediaQuery.of(context).size.height * 0.2) *
+                  6 /
+                  7),
         );
         _startTalkingAnimation();
       });
@@ -355,188 +356,209 @@ Future.delayed(const Duration(milliseconds: 500), () {
 
       return players;
     }).toList();
- 
+
     currentPlayers = formations.first;
     // print("Actions: $actions");
   }
 
   @override
   Widget build(BuildContext context) {
-    return 
-    SafeArea(
-        key: _safeAreaKey,
-        child: Scaffold(
-          body: Container(
-            color: const Color(0xFF1E6C41),
-            child: Column(
-              children: [
-                Expanded(
-                    flex: 1,
-                    child: Container(child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final fieldSize = constraints.biggest;
-                        return Stack(
-                          children: [
-                            // Draw Goal
-                            CustomPaint(
-                              size: fieldSize,
-                              painter: Goal(),
-                            ),
-                          ],
-                        );
-                      },
-                    ))),
-                Expanded(
-                  flex: 6,
+    return SafeArea(
+      key: _safeAreaKey,
+      child: Scaffold(
+        body: Container(
+          color: const Color(0xFF1E6C41),
+          child: Column(
+            children: [
+              Container(
+                height: 120,
+                child: SizedBox(),
+              ),
+              Container(
+                  height: MediaQuery.of(context).size.height * 0.2,
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       final fieldSize = constraints.biggest;
-                      return RepaintBoundary(
-                        key: _fieldKey,
-                        child: Stack(
-                          children: [
-                            CustomPaint(
-                              size: fieldSize,
-                              painter: HalfFootballFieldPainter(),
-                            ),
-                            if (_currentDescription != "")
-                              Positioned(
-                                bottom: 0,
-                                left: 0,
-                                child: SizedBox(
-                                  width: MediaQuery.of(context).size.width * 0.4,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.3,
-                                  child: LoadingAnimation(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.4,
-                                    height:
-                                        MediaQuery.of(context).size.height * 0.3,
-                                    imagePrefix: 'assets/pep/pep_',
-                                    frameCount: 29,
-                                    imageExtension: '.png',
-                                    frameDuration:
-                                        const Duration(milliseconds: 100),
-                                    loop: true,
-                                    in_tactics: false,
-                                    // currentFrameIndex: _talkingFrameIndex,
-                                  ),
+                      return Stack(
+                        children: [
+                          // Draw Goal
+                          CustomPaint(
+                            size: fieldSize,
+                            painter: Goal(),
+                          ),
+
+                    
+                            
+                          Positioned(
+                            top: 0,
+                            left: 50,
+                            right: 50,
+                             child: Center( child: 
+                                                       Container(
+                              width: fieldSize.width*0.7,
+                              height: 0.5 * fieldSize.height,
+                              
+                                child: Image.asset(
+                                  'assets/logo.png', // Your goal image path
+                                  fit: BoxFit.fill,
                                 ),
                               ),
-                            ...currentPlayers.map((player) {
-                              final pos = Offset(
-                                player.position.dx * fieldSize.width,
-                                player.position.dy * fieldSize.height,
-                              );
-                              return AnimatedPositioned(
-                                key: ValueKey(player.number),
-                                duration: Duration(seconds: 1),
-                                left: pos.dx,
-                                top: pos.dy ,
-                                child: PlayerDot(
-                                  team: player.team,
-                                  color: player.color,
-                                  number: player.number,
-                                  highlight: player.ballpossession,
-                                ),
-                              );
-                            }),
-                            if (ballPosition != null)
-                              AnimatedPositioned(
-                                duration: Duration(seconds: 1),
-                                left: ballPosition!.dx +
-                                    (MediaQuery.of(context).size.width * 0.01),
-                                top: ballPosition!.dy -
-                                    (MediaQuery.of(context).size.height * 0.01),
-                                child: BallWidget(),
-                              ),
-                            // Add description text here - before the finish buttons
-                            if (_currentDescription != "" &&
-                                _currentDescription != "finish")
-                              Positioned(
-                                bottom: 70,
-                                left: 20,
-                                right: 20,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.7),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    _currentDescription,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ),
-                              ),
-                            (_currentDescription == "finish")
-                                ? Positioned(
-                                    bottom: 20,
-                                    right: 10,
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment: CrossAxisAlignment.end,
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              currentFormationIndex = 0;
-                                              _currentDescription = "";
-                                              _descriptionOpacity = 0.0;
-                                              counter = 0;
-                                              tactics.clear();
-                                            });
-                                            Future.delayed(
-                                                const Duration(milliseconds: 100),
-                                                _startAnimationLoop);
-                                          },
-                                          child: Row(children: [
-                                            Text(
-                                              "Reset Tactics",
-                                              style: TextStyle(fontSize: 15),
-                                            )
-                                          ]),
-                                        ),
-                                        SizedBox(height: 3),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    TacticsReportPage(
-                                                  tactics: tactics,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                          child: Text(
-                                            "View Report",
-                                            style: TextStyle(fontSize: 15),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                : SizedBox(),
-                          ],
-                        ),
+                                                       ),
+                           ),
+                        ],
                       );
                     },
-                  ),
+                  )),
+              Expanded(
+                flex: 6,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final fieldSize = constraints.biggest;
+                    return RepaintBoundary(
+                      key: _fieldKey,
+                      child: Stack(
+                        children: [
+                          CustomPaint(
+                            size: fieldSize,
+                            painter: HalfFootballFieldPainter(),
+                          ),
+                          if (_currentDescription != "")
+                            Positioned(
+                              bottom: 0,
+                              left: 0,
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.3,
+                                child: LoadingAnimation(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.4,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.3,
+                                  imagePrefix: 'assets/pep/pep_',
+                                  frameCount: 29,
+                                  imageExtension: '.png',
+                                  frameDuration:
+                                      const Duration(milliseconds: 100),
+                                  loop: true,
+                                  in_tactics: false,
+                                  // currentFrameIndex: _talkingFrameIndex,
+                                ),
+                              ),
+                            ),
+                          ...currentPlayers.map((player) {
+                            final pos = Offset(
+                              player.position.dx * fieldSize.width,
+                              player.position.dy * fieldSize.height,
+                            );
+                            return AnimatedPositioned(
+                              key: ValueKey(player.number),
+                              duration: Duration(seconds: 1),
+                              left: pos.dx,
+                              top: pos.dy,
+                              child: PlayerDot(
+                                team: player.team,
+                                color: player.color,
+                                number: player.number,
+                                highlight: player.ballpossession,
+                              ),
+                            );
+                          }),
+                          if (ballPosition != null)
+                            AnimatedPositioned(
+                              duration: Duration(seconds: 1),
+                              left: ballPosition!.dx +
+                                  (MediaQuery.of(context).size.width * 0.01),
+                              top: ballPosition!.dy -
+                                  (MediaQuery.of(context).size.height * 0.01),
+                              child: BallWidget(),
+                            ),
+                          // Add description text here - before the finish buttons
+                          if (_currentDescription != "" &&
+                              _currentDescription != "finish")
+                            Positioned(
+                              bottom: 70,
+                              left: 20,
+                              right: 20,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.7),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  _currentDescription,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          (_currentDescription == "finish")
+                              ? Positioned(
+                                  bottom: 20,
+                                  right: 10,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            currentFormationIndex = 0;
+                                            _currentDescription = "";
+                                            _descriptionOpacity = 0.0;
+                                            counter = 0;
+                                            tactics.clear();
+                                          });
+                                          Future.delayed(
+                                              const Duration(milliseconds: 100),
+                                              _startAnimationLoop);
+                                        },
+                                        child: Row(children: [
+                                          Text(
+                                            "Reset Tactics",
+                                            style: TextStyle(fontSize: 15),
+                                          )
+                                        ]),
+                                      ),
+                                      SizedBox(height: 3),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  TacticsReportPage(
+                                                tactics: tactics,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Text(
+                                          "View Report",
+                                          style: TextStyle(fontSize: 15),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : SizedBox(),
+                        ],
+                      ),
+                    );
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-               
-             ),
-       );
+        ),
+      ),
+    );
   }
 }
 
@@ -566,12 +588,10 @@ class Player {
       );
     }
     return Player(
-      position:  Offset(
+      position: Offset(
         json['position']['dx'] ?? 0.0,
         json['position']['dy'] ?? 0.0,
-
-),
-
+      ),
       color: Color(json['color']),
       number: json['number'],
       ballpossession: json['ballpossession'],

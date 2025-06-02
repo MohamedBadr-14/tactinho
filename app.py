@@ -210,13 +210,13 @@ class SceneMatcher:
                 if player["team"] == 1:
                     query_team1_players.append({
                         "id": player_id,
-                        "position_tranformed": np.array(player["position_transformed"]),
+                        "position_transformed": np.array(player["position_transformed"]),
                         "player": player
                     })
                 else:
                     query_team2_players.append({
                         "id": player_id,
-                        "position_tranformed": np.array(player["position_transformed"]),
+                        "position_transformed": np.array(player["position_transformed"]),
                         "player": player
                     })
             
@@ -226,13 +226,13 @@ class SceneMatcher:
                 if player["team"] == 1:
                     matched_team1_players.append({
                         "id": player_id,
-                        "position_tranformed": np.array(player["position_transformed"]),
+                        "position_transformed": np.array(player["position_transformed"]),
                         "player": player
                     })
                 else:
                     matched_team2_players.append({
                         "id": player_id,
-                        "position_tranformed": np.array(player["position_transformed"]),
+                        "position_transformed": np.array(player["position_transformed"]),
                         "player": player
                     })
             
@@ -316,14 +316,14 @@ def predict_sequence():
         if not input_scene:
             return jsonify({"error": "No scene provided"}), 400
         
-        query_feats = matcher.extract_features(input_scene)        
+        query_feats = matcher.extract_features(input_scene)   
         candidates = matcher.filter_scenes(query_feats)
         
-        matched_id = matcher.match_formations(query_feats, candidates)
+        matched_id, best_team1_mapping, best_team2_mapping = matcher.match_formations(query_feats, candidates)
         if matched_id is None:
             return jsonify({"error": "No matching scene found"}), 404
         
-        sequence = matcher.get_sequence_from_match(matched_id, input_scene)        
+        sequence = matcher.get_sequence_from_match(matched_id, input_scene,best_team1_mapping, best_team2_mapping)
         serializable_sequence = convert_numpy(sequence)
 
         

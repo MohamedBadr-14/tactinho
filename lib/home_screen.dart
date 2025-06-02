@@ -33,17 +33,7 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 32),
                 const _RoadmapSection(),
                 const SizedBox(height: 32),
-                _ActionButton(
-                num: 1,
-                onPressed: () {
-                    // Navigate to the Scene Selection Screen
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                        builder: (context) => const SceneSelectionScreen(),
-                        ));
-                },
-                ),
+           
                 SizedBox(height: 16),
 
 
@@ -53,6 +43,31 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         ),
+      ),
+
+      bottomNavigationBar: Container(
+        child:           Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: _ActionButton(
+                  num: 1,
+                  onPressed: () {
+                      // Navigate to the Scene Selection Screen
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                          builder: (context) => const SceneSelectionScreen(),
+                          ));
+                  },
+                  ),
+        ),
+   
+
+
+
+
+
+
+
       ),
     );
   }
@@ -93,7 +108,7 @@ class _WelcomeHeader extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'FIFAI',
+            'FIF-AI',
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
@@ -238,8 +253,8 @@ class _ActionButton extends StatelessWidget {
           ),
           elevation: 2,
         ),
-        child:  Text(num == 1 ?
-          'Get Started':'Continue',
+        child:  Text(
+          'Get Started',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
